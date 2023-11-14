@@ -57,38 +57,42 @@ class HomeScreen extends StatelessWidget {
                     AlarmModel alarm = state.alarms[index];
 
                     return GestureDetector(
-                      onTap: () {
-                        bloc.editAlarm(context, index);
-                      },
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: alarm.isEnabled
-                                  ? Colors.white
-                                  : Colors.grey.shade200,
-                              border:
-                                  Border.all(width: 1.w, color: Colors.grey),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Image.asset(
-                              'assets/images/${alarm.sound.image}',
-                              width: 100.w,
-                              height: 100.h,
-                            ),
+                        onTap: () {
+                          bloc.editAlarm(context, index);
+                        },
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(alarm.title), // <-- Add your 'data' text here
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: alarm.isEnabled
+                                      ? Colors.white
+                                      : Colors.grey.shade200,
+                                  border: Border.all(
+                                      width: 1.w, color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Image.asset(
+                                  'assets/images/${alarm.sound.image}',
+                                  width: 100.w,
+                                  height: 100.h,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                alarm.ringTime,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            alarm.ringTime,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                        ));
                   },
                 );
               },

@@ -12,7 +12,6 @@ class AlarmState {
 
   List<AlarmModel> alarms = [];
   int indexSelectedAlarm = -1;
-
   bool isLoading;
 
   final AudioPlayer player = AudioPlayer();

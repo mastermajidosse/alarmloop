@@ -1,10 +1,14 @@
+import 'package:alarmloop/cubit/day_selection_state.dart';
 import 'package:alarmloop/model/alarm_model.dart';
 import 'package:alarmloop/ui/choose_alarm/choose_alarm_screen.dart';
+import 'package:alarmloop/widgets/custom_card.dart';
+import 'package:alarmloop/widgets/inputs/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../cubit/alarm_cubit.dart';
+import '../../cubit/day_selection_cubit.dart';
 import '../../widgets/button/icon_button.dart';
 import '../../widgets/button/my_chip.dart';
 
@@ -16,7 +20,15 @@ class EditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
-
+    List<bool> selectedDays = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]; // Monday to Sunday
     // Initial Selected Value
     String dropdownvalue = 'min';
 
@@ -27,6 +39,7 @@ class EditScreen extends StatelessWidget {
     ];
 
     TextEditingController loopIntervalController = TextEditingController();
+    TextEditingController alaram = TextEditingController();
 
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
@@ -81,7 +94,8 @@ class EditScreen extends StatelessWidget {
                         border: Border.all(width: 1.w, color: Colors.grey),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: BlocBuilder<AlarmCubit, AlarmState>(builder: (context, state) {
+                      child: BlocBuilder<AlarmCubit, AlarmState>(
+                          builder: (context, state) {
                         return Image.asset(
                           'assets/images/${alarm.sound.image}',
                           width: 150.w,
@@ -91,7 +105,8 @@ class EditScreen extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, ChooseAlarmScreen.routeName);
+                        Navigator.pushNamed(
+                            context, ChooseAlarmScreen.routeName);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,7 +115,8 @@ class EditScreen extends StatelessWidget {
                             Icons.music_note_rounded,
                             color: Colors.red,
                           ),
-                          BlocBuilder<AlarmCubit, AlarmState>(builder: (context, state) {
+                          BlocBuilder<AlarmCubit, AlarmState>(
+                              builder: (context, state) {
                             return Text(
                               alarm.sound.name,
                               style: TextStyle(fontSize: 20.sp),
@@ -157,104 +173,146 @@ class EditScreen extends StatelessWidget {
                           Icons.loop_rounded,
                           color: Colors.red,
                         ),
-                        BlocBuilder<AlarmCubit, AlarmState>(builder: (context, state) {
+                        BlocBuilder<AlarmCubit, AlarmState>(
+                            builder: (context, state) {
                           bloc.getLoopIntervals();
                           List<String> loopIntervals = state.loopIntervals;
-
-                          return Wrap(
-                            children: [
-                              ...List.generate(
-                                loopIntervals.length,
-                                (int index) {
-                                  bool isSelected = alarm.loopInterval == loopIntervals[index];
-
-                                  return MyChip(
-                                    text: loopIntervals[index],
-                                    backgroundColor:
-                                        isSelected ? Colors.blue : Colors.grey.shade200,
-                                    textColor: isSelected ? Colors.white : Colors.black,
-                                    onTap: () {
-                                      bloc.setselectedLoopInterval(loopIntervals[index]);
-                                    },
-                                  );
-                                },
-                                growable: true,
-                              ),
-                              MyChip(
-                                text: '+',
-                                backgroundColor: Colors.grey.shade200,
-                                textColor: Colors.black,
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    barrierLabel: 'Add loop interval',
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Add loop interval'),
-                                        actions: [
-                                          TextButton(
-                                            child: const Text("Cancel"),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                          TextButton(
-                                            child: const Text("Add"),
-                                            onPressed: () {
-                                              bloc.addLoopInterval(
-                                                context,
-                                                "${loopIntervalController.text} $dropdownvalue",
-                                                alarm.id.toString(),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                        content: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              width: 100.w,
-                                              child: TextField(
-                                                controller: loopIntervalController,
-                                                keyboardType: TextInputType.number,
-                                                autofocus: true,
-                                                decoration: const InputDecoration(
-                                                    border: OutlineInputBorder(
-                                                      borderRadius: BorderRadius.all(
-                                                        Radius.circular(10),
-                                                      ),
-                                                    ),
-                                                    hintText: 'Value'),
-                                              ),
-                                            ),
-                                            SizedBox(width: 20.w),
-                                            StatefulBuilder(builder: (context, setState) {
-                                              return DropdownButton(
-                                                value: dropdownvalue,
-                                                icon: const Icon(Icons.keyboard_arrow_down),
-                                                items: items.map((String items) {
-                                                  return DropdownMenuItem(
-                                                    value: items,
-                                                    child: Text(items),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (String? newValue) {
-                                                  dropdownvalue = newValue!;
-                                                  setState(() {});
-                                                },
-                                              );
-                                            }),
-                                          ],
-                                        ),
+                          return Expanded(
+                            child: SingleChildScrollView(
+                              child: Wrap(
+                                children: [
+                                  ...List.generate(
+                                    loopIntervals.length,
+                                    (int index) {
+                                      bool isSelected = alarm.loopInterval ==
+                                          loopIntervals[index];
+                                      return MyChip(
+                                        text: loopIntervals[index],
+                                        backgroundColor: isSelected
+                                            ? Colors.blue
+                                            : Colors.grey.shade200,
+                                        textColor: isSelected
+                                            ? Colors.white
+                                            : Colors.black,
+                                        onTap: () {
+                                          bloc.setselectedLoopInterval(
+                                              loopIntervals[index]);
+                                        },
                                       );
                                     },
-                                  );
-                                },
+                                    growable: true,
+                                  ),
+                                  MyChip(
+                                    text: '+',
+                                    backgroundColor: Colors.grey.shade200,
+                                    textColor: Colors.black,
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        barrierLabel: 'Add loop interval',
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title:
+                                                const Text('Add loop interval'),
+                                            actions: [
+                                              TextButton(
+                                                child: const Text("Cancel"),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text("Add"),
+                                                onPressed: () {
+                                                  bloc.addLoopInterval(
+                                                    context,
+                                                    "${loopIntervalController.text} $dropdownvalue",
+                                                    alarm.id.toString(),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                            content: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  width: 100.w,
+                                                  child: TextField(
+                                                    controller:
+                                                        loopIntervalController,
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    autofocus: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            border:
+                                                                OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    10),
+                                                              ),
+                                                            ),
+                                                            hintText: 'Value'),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 20.w),
+                                                StatefulBuilder(builder:
+                                                    (context, setState) {
+                                                  return DropdownButton(
+                                                    value: dropdownvalue,
+                                                    icon: const Icon(Icons
+                                                        .keyboard_arrow_down),
+                                                    items: items
+                                                        .map((String items) {
+                                                      return DropdownMenuItem(
+                                                        value: items,
+                                                        child: Text(items),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged:
+                                                        (String? newValue) {
+                                                      dropdownvalue = newValue!;
+                                                      setState(() {});
+                                                    },
+                                                  );
+                                                }),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           );
                         }),
                       ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 6.h),
+                      child: const Divider(),
+                    ),
+                    BlocBuilder<DaySelectionCubit, DaySelectionState>(
+                      builder: (context, state) {
+                        return 
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: List.generate(
+                                7,
+                                (index) => DayCard(index),
+                              ),
+                        );
+                      },
+                    ),
+                    CustomTextField(
+                      label: 'Alarm name',
+                      icon: Icons.label,
+                      controller: alaram,
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -266,15 +324,16 @@ class EditScreen extends StatelessWidget {
                         BlocBuilder<AlarmCubit, AlarmState>(
                           builder: (context, state) {
                             alarm.isEnabled = bloc.isTimerOn();
-
                             return MyIconButton(
                               text: bloc.isTimerOn() ? 'Turn Off' : 'Turn On',
-                              iconData:
-                                  bloc.isTimerOn() ? Icons.notifications_off : Icons.notifications,
+                              iconData: bloc.isTimerOn()
+                                  ? Icons.notifications_off
+                                  : Icons.notifications,
                               onPressed: () {
                                 bloc.isTimerOn()
                                     ? bloc.turnOffTimer(alarm.id)
-                                    : bloc.turnOnTimer(alarm.id, alarm.sound.sound);
+                                    : bloc.turnOnTimer(
+                                        alarm.id, alarm.sound.sound);
                               },
                             );
                           },
@@ -296,5 +355,28 @@ class EditScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String getDayName(int index) {
+    // Adjust the index to start from Monday
+    final dayIndex = (index + 1) % 7;
+    switch (dayIndex) {
+      case 0:
+        return 'Monday';
+      case 1:
+        return 'Tuesday';
+      case 2:
+        return 'Wednesday';
+      case 3:
+        return 'Thursday';
+      case 4:
+        return 'Friday';
+      case 5:
+        return 'Saturday';
+      case 6:
+        return 'Sunday';
+      default:
+        return '';
+    }
   }
 }

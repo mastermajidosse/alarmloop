@@ -6,6 +6,7 @@ class AlarmModel {
   bool isEnabled;
   String ringTime;
   String loopInterval;
+  String title;
 
   AlarmModel({
     required this.id,
@@ -13,6 +14,7 @@ class AlarmModel {
     this.isEnabled = false,
     this.ringTime = '--:--',
     this.loopInterval = '',
+    this.title = 'alarm',
   });
 
   Map<String, Object> toMap() => {
@@ -21,6 +23,7 @@ class AlarmModel {
         "isEnabled": isEnabled,
         "ringTime": ringTime,
         "loopInterval": loopInterval,
+        "title": title,
       };
 
   factory AlarmModel.fromMap(Map<String, dynamic> json) => AlarmModel(
@@ -29,5 +32,6 @@ class AlarmModel {
         isEnabled: json["isEnabled"] as bool,
         ringTime: json["ringTime"] as String,
         loopInterval: json["loopInterval"] as String,
+        title: json["title"] as String,
       );
 }

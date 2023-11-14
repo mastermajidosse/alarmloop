@@ -1,3 +1,4 @@
+import 'package:alarmloop/cubit/day_selection_cubit.dart';
 import 'package:alarmloop/ui/home/home_screen.dart';
 import 'package:alarmloop/utils/routes.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -10,7 +11,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AndroidAlarmManager.initialize();
 
-  runApp(const MyApp());
+  runApp(
+    ScreenUtilInit(
+      designSize: Size(360, 360),
+      builder: (conext, child) => MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -27,6 +33,9 @@ class MyApp extends StatelessWidget {
             providers: [
               BlocProvider<AlarmCubit>(
                 create: (BuildContext context) => AlarmCubit(),
+              ),
+              BlocProvider<DaySelectionCubit>(
+                create: (BuildContext context) =>  DaySelectionCubit(),
               ),
             ],
             child: MaterialApp(
