@@ -1,9 +1,11 @@
+import 'package:alarmloop/model/sound_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../cubit/alarm_cubit.dart';
 import '../../model/alarm_model.dart';
+import '../../utils/demo_data.dart';
 
 class HomeScreen extends StatelessWidget {
   static String routeName = "/home";
@@ -13,7 +15,15 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     bloc.getAlarmsList();
+    
 
+    // Replace this line with bloc.getAlarmsList() when fetching real alarms
+    /// The line `bloc.setAlarmsList(fakeAlarms);` is setting the list of alarms in the `AlarmCubit` to
+    /// a list of fake alarms (`fakeAlarms`). This is likely used for testing or demonstration purposes,
+    /// where the `fakeAlarms` list is predefined and used as a placeholder until the real alarms are
+    /// fetched or provided.
+    bloc.setAlarmsList(fakeAlarms);
+     
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
       child: Scaffold(
@@ -52,9 +62,16 @@ class HomeScreen extends StatelessWidget {
                     crossAxisSpacing: 20.w,
                     mainAxisSpacing: 14.w,
                   ),
-                  itemCount: state.alarms.length,
+                  // itemCount: state.alarms.length,
+                  itemCount: fakeAlarms.length,
                   itemBuilder: (context, index) {
-                    AlarmModel alarm = state.alarms[index];
+
+                    /// The line `AlarmModel alarm = fakeAlarms[index];` is assigning the `AlarmModel`
+                    /// object at the specified `index` in the `fakeAlarms` list to the `alarm`
+                    /// variable.
+                    AlarmModel alarm = fakeAlarms[index];
+
+                    // AlarmModel alarm = state.alarms[index];
 
                     return GestureDetector(
                         onTap: () {
@@ -65,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(alarm.title), // <-- Add your 'data' text here
+                              Text(alarm.title), 
                               Container(
                                 decoration: BoxDecoration(
                                   color: alarm.isEnabled

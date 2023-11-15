@@ -37,14 +37,25 @@ class AlarmCubit extends Cubit<AlarmState> {
     return state.alarms[state.indexSelectedAlarm].isEnabled;
   }
 
+  // New method to set the list of alarms
+  void setAlarmsList(List<AlarmModel> alarms) {
+    emit(
+      AlarmState(
+        alarms: alarms,
+        loopIntervals: state.loopIntervals,
+        indexSelectedAlarm: state.indexSelectedAlarm,
+      ),
+    ); // Assuming you have an AlarmsLoaded state
+  }
+
   void turnOnTimer(int id, String alarm) async {
     String loopInterval = state.alarms[state.indexSelectedAlarm].loopInterval;
     if (loopInterval.isEmpty) {
       return;
     }
 
-    int minutes =
-        int.parse(loopInterval.split(" ")[0]) * (loopInterval.split(" ")[1] == "min" ? 1 : 60);
+    int minutes = int.parse(loopInterval.split(" ")[0]) *
+        (loopInterval.split(" ")[1] == "min" ? 1 : 60);
 
     // setup alarm manager to start alarm as user wants
     AndroidAlarmManager.periodic(
@@ -130,7 +141,9 @@ class AlarmCubit extends Cubit<AlarmState> {
 
     String data = prefs!.getString('alarms') ?? '[]';
 
-    state.alarms = (json.decode(data) as List).map((alarm) => AlarmModel.fromMap(alarm)).toList();
+    state.alarms = (json.decode(data) as List)
+        .map((alarm) => AlarmModel.fromMap(alarm))
+        .toList();
 
     emit(AlarmState(
       alarms: state.alarms,
@@ -155,7 +168,8 @@ class AlarmCubit extends Cubit<AlarmState> {
       initialEntryMode: TimePickerEntryMode.dial,
     );
     if (timeOfDay != null && timeOfDay != selectedTime) {
-      state.alarms[state.indexSelectedAlarm].ringTime = '${timeOfDay.hour}:${timeOfDay.minute}';
+      state.alarms[state.indexSelectedAlarm].ringTime =
+          '${timeOfDay.hour}:${timeOfDay.minute}';
 
       emit(AlarmState(
         alarms: state.alarms,

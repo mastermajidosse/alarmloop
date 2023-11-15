@@ -20,3 +20,5 @@ class AlarmState {
   int indexSelectedSound;
   List<String> loopIntervals;
 }
+
+
