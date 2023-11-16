@@ -179,6 +179,19 @@ class AlarmCubit extends Cubit<AlarmState> {
     }
   }
 
+  void saveAlarmLabel(String label) {
+    final List<AlarmModel> updatedAlarms = List.from(state.alarms);
+    updatedAlarms[state.indexSelectedAlarm] =
+        updatedAlarms[state.indexSelectedAlarm].copyWith(label: label);
+    emit(
+      AlarmState(
+        alarms: updatedAlarms,
+        loopIntervals: state.loopIntervals,
+        indexSelectedAlarm: state.indexSelectedAlarm,
+      ),
+    );
+  }
+
   void setselectedLoopInterval(String value) {
     state.alarms[state.indexSelectedAlarm].loopInterval = value;
 
@@ -298,6 +311,7 @@ class AlarmCubit extends Cubit<AlarmState> {
 
     String json = jsonEncode(state.alarms.map((e) => e.toMap()).toList());
     await prefs!.setString('alarms', json);
+    
 
     // ignore: use_build_context_synchronously
     Navigator.pop(context);

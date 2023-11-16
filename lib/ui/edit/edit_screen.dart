@@ -20,15 +20,6 @@ class EditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
-    List<bool> selectedDays = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ]; // Monday to Sunday
     // Initial Selected Value
     String dropdownvalue = 'min';
 
@@ -39,7 +30,7 @@ class EditScreen extends StatelessWidget {
     ];
 
     TextEditingController loopIntervalController = TextEditingController();
-    TextEditingController alaram = TextEditingController();
+    TextEditingController alarmController = TextEditingController();
 
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
@@ -72,6 +63,7 @@ class EditScreen extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   bloc.saveAlarm(context);
+                  bloc.saveAlarmLabel(alarm.title);
                 },
                 color: Colors.red,
                 icon: const Icon(Icons.check),
@@ -299,20 +291,23 @@ class EditScreen extends StatelessWidget {
                     ),
                     BlocBuilder<DaySelectionCubit, DaySelectionState>(
                       builder: (context, state) {
-                        return 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: List.generate(
-                                7,
-                                (index) => DayCard(index),
-                              ),
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: List.generate(
+                            7,
+                            (index) => DayCard(index),
+                          ),
                         );
                       },
                     ),
                     CustomTextField(
                       label: 'Alarm name',
                       icon: Icons.label,
-                      controller: alaram,
+                      initialAlarm: alarm.title,
+                      onChanged: (value) {
+                        // Handle the changed value
+                        alarm.title = value;
+                      },
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.h),

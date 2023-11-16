@@ -34,4 +34,16 @@ class AlarmModel {
         loopInterval: json["loopInterval"] as String,
         title: json["title"] as String,
       );
+
+AlarmModel copyWith({String? label}) {
+  return AlarmModel(
+    id: this.id,
+    sound: this.sound,
+    isEnabled: this.isEnabled,
+    ringTime: this.ringTime,
+    loopInterval: this.loopInterval,
+    title: label ?? this.title, // If label is not provided, use the existing title
+  );
+}
+
 }

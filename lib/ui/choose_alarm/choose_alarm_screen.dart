@@ -14,7 +14,6 @@ class ChooseAlarmScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     // bloc.getSoundsList();
-
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
       child: Scaffold(
@@ -45,81 +44,101 @@ class ChooseAlarmScreen extends StatelessWidget {
         body: SafeArea(
           child: BlocBuilder<AlarmCubit, AlarmState>(
             builder: (context, state) {
-              return ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                itemCount: sounds.length,
-                itemBuilder: (BuildContext context, int index) {
-                  SoundModel sound = sounds[index];
-
-                  return GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      bloc.setAlarmSound(context, index);
-                    },
-                    child: Container(
-                      height: 60.h,
-                      width: double.maxFinite,
+              return Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 15, top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: Text("Editor's Choice"),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.symmetric(
-                          vertical: 10.h, horizontal: 10.w),
-                      child: Row(
-                        children: [
-                          // play/pause button
-                          GestureDetector(
-                            onTap: () {
-                              bloc.playPauseAudio(index, sound.sound);
-                            },
-                            behavior: HitTestBehavior.translucent,
-                            child: Container(
-                              width: 50.w,
-                              height: 50.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  width: 2.w,
-                                  color: Colors.red,
+                          horizontal: 10.w, vertical: 10.h),
+                      itemCount: sounds.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        SoundModel sound = sounds[index];
+
+                        return GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            bloc.setAlarmSound(context, index);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                top: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                            height: 60.h,
+                            width: double.maxFinite,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.h, horizontal: 10.w),
+                            child: Row(
+                              children: [
+                                // play/pause button
+                                GestureDetector(
+                                  onTap: () {
+                                    bloc.playPauseAudio(index, sound.sound);
+                                  },
+                                  behavior: HitTestBehavior.translucent,
+                                  child: Container(
+                                    width: 50.w,
+                                    height: 50.h,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        width: 2.w,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      state.indexPlayingSound == index
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.red,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: Icon(
-                                state.indexPlayingSound == index
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                color: Colors.red,
-                              ),
+
+                                // alarm icon
+                                Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.h),
+                                  child: Image.asset(
+                                    'assets/images/${sound.image}',
+                                    width: 50.w,
+                                    height: 50.w,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+
+                                // sound details
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      sound.name,
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                    ),
+                                    const Text(
+                                      'universal',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-
-                          // alarm icon
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.h),
-                            child: Image.asset(
-                              'assets/images/${sound.image}',
-                              width: 50.w,
-                              height: 50.w,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-
-                          // sound details
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                sound.name,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              const Text(
-                                'universal',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               );
             },
           ),

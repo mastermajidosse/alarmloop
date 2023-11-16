@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-
 class CustomTextField extends StatelessWidget {
   final String label;
+  final String initialAlarm;
   final IconData icon;
-  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
-  CustomTextField({required this.label, required this.icon, required this.controller});
+  CustomTextField({
+    required this.label,
+    required this.icon,
+    required this.initialAlarm,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class CustomTextField extends StatelessWidget {
           SizedBox(width: 10.0),
           Expanded(
             child: TextFormField(
-              controller: controller,
+              onChanged: onChanged,
               decoration: InputDecoration(
                 hintText: label,
                 filled: true,
@@ -30,6 +35,7 @@ class CustomTextField extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
               ),
+              initialValue: initialAlarm,
             ),
           ),
         ],
@@ -37,4 +43,3 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
-
