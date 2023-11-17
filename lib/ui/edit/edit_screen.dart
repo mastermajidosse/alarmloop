@@ -30,7 +30,7 @@ class EditScreen extends StatelessWidget {
     ];
 
     TextEditingController loopIntervalController = TextEditingController();
-    TextEditingController alarmController = TextEditingController();
+    // TextEditingController alarmController = TextEditingController();
 
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
