@@ -1,23 +1,103 @@
 // Define the cubit
+import 'dart:convert';
+
 import 'package:alarmloop/alarm_cubit/alarm_updated_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/alarm.dart';
 
 class UpdatedAlarmsCubit extends Cubit<UpdatedAlarmsState> {
-  UpdatedAlarmsCubit() : super(UpdatedAlarmsState([]));
+  UpdatedAlarmsCubit() : super(UpdatedAlarmsState([], []));
 
-  void loadAlarms() {
-    // Replace this with actual data fetching logic
-    List<Alarm> demoAlarms = [
-      Alarm('Alarm 1', 'Mon Tue Wed', true),
-      Alarm('Alarm 2', 'Thu Fri Sat', false),
-      Alarm('Alarm 2', 'Thu Fri Sat', false),
-      Alarm('Alarm 2', 'Thu Fri Sat', false),
-      Alarm('Alarm 2', 'Thu Fri Sat', false),
-      // Add more demo data as needed
-    ];
-
-    emit(UpdatedAlarmsState(demoAlarms));
+  Future<void> loadAlarms() async {
+    try {
+      List<Alarm> fetchedAlarms = await fetchDataFromExternalSource();
+      emit(UpdatedAlarmsState(fetchedAlarms, []));
+    } catch (error) {
+      print("Error loading alarms: $error");
+    }
   }
+
+  Future<List<Alarm>> fetchDataFromExternalSource() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? alarmStrings = prefs.getStringList('alarms');
+
+    if (alarmStrings != null) {
+      List<Alarm> demoAlarms =
+          alarmStrings.map((json) => Alarm.fromJson(jsonDecode(json))).toList();
+      return demoAlarms;
+    } else {
+      return [];
+    }
+  }
+
+  //add function
+  Future<void> addAlarm(Alarm newAlarm) async {
+    List<Alarm> currentAlarms = state.alarms;
+    List<Alarm> updatedAlarms = [...currentAlarms, newAlarm];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> updatedAlarmStrings =
+        updatedAlarms.map((alarm) => jsonEncode(alarm.toJson())).toList();
+    await prefs.setStringList('alarms', updatedAlarmStrings);
+
+    emit(UpdatedAlarmsState(updatedAlarms, []));
+  }
+
+  // delete function
+  Future<void> deleteAlarm(Alarm alarm) async {
+    List<Alarm> currentAlarms = state.alarms;
+    List<Alarm> updatedAlarms = List.from(currentAlarms)..remove(alarm);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> updatedAlarmStrings =
+        updatedAlarms.map((alarm) => jsonEncode(alarm.toJson())).toList();
+    await prefs.setStringList('alarms', updatedAlarmStrings);
+
+    emit(UpdatedAlarmsState(updatedAlarms, []));
+  }
+
+  void updateSelectedDays(String newSelectedDays) {
+    List<Alarm> updatedAlarms = state.alarms.map((alarm) {
+      return Alarm(
+        title: alarm.title,
+        selectedDays: newSelectedDays,
+        isAM: alarm.isAM,
+        isSwitched: alarm.isSwitched,
+        hour: alarm.hour,
+        minute: alarm.minute,
+        period: alarm.period,
+      );
+    }).toList();
+
+    emit(UpdatedAlarmsState(updatedAlarms, newSelectedDays));
+  }
+
+ void updateAlarmSelectedDays(int alarmIndex, List<bool> newSelectedDays) {
+  List<Alarm> updatedAlarms = List.from(state.alarms);
+
+  // Check if alarmIndex is within the valid range
+  if (alarmIndex >= 0 && alarmIndex < updatedAlarms.length) {
+    Alarm oldAlarm = updatedAlarms[alarmIndex];
+
+    // Create a new Alarm instance with updated selectedDays
+    Alarm updatedAlarm = Alarm(
+      isSwitched: oldAlarm.isSwitched,
+      isAM: oldAlarm.isAM,
+      title: oldAlarm.title,
+      selectedDays:
+          newSelectedDays.map((selected) => selected ? '1' : '0').join(' '),
+      hour: oldAlarm.hour,
+      minute: oldAlarm.minute,
+      period: oldAlarm.period,
+    );
+
+    updatedAlarms[alarmIndex] = updatedAlarm;
+    emit(UpdatedAlarmsState(updatedAlarms, ''));
+  } else {
+    print('Invalid alarm index: $alarmIndex');
+  }
+}
+
 }

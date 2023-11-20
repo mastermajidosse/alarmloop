@@ -2,22 +2,38 @@ import 'package:alarmloop/cubit/day_selection_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../alarm_cubit/alarm_updated_cubit.dart';
 import '../cubit/day_selection_cubit.dart';
 
 class DayCard extends StatelessWidget {
-  final int index;
+   final int dayIndex;
+  final int alarmIndex;
 
-  DayCard(this.index);
+  const DayCard({
+    required this.dayIndex,
+    required this.alarmIndex,
+  });
+
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.read<DaySelectionCubit>().toggleDay(index);
+        // Dispatch the toggleDay event when the card is tapped
+        context.read<DaySelectionCubit>().toggleDay(dayIndex);
+
+        // Get the selected days from the DaySelectionCubit
+        List<bool> selectedDays =
+            context.read<DaySelectionCubit>().state.selectedDays;
+
+        // Update the selected days of the corresponding alarm in UpdatedAlarmsCubit
+        context
+            .read<UpdatedAlarmsCubit>()
+            .updateAlarmSelectedDays(alarmIndex, selectedDays);
       },
       child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
         builder: (context, state) {
-          final isSelected = state.selectedDays[index];
+          final isSelected = state.selectedDays[dayIndex];
 
           return Container(
             width: 40.0,
@@ -29,7 +45,7 @@ class DayCard extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                getDayAbbreviation(index),
+                getDayAbbreviation(dayIndex),
                 style: TextStyle(
                   color: isSelected ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,

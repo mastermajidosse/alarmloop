@@ -289,17 +289,17 @@ class EditScreen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 6.h),
                       child: const Divider(),
                     ),
-                    BlocBuilder<DaySelectionCubit, DaySelectionState>(
-                      builder: (context, state) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: List.generate(
-                            7,
-                            (index) => DayCard(index),
-                          ),
-                        );
-                      },
-                    ),
+                    // BlocBuilder<DaySelectionCubit, DaySelectionState>(
+                    //   builder: (context, state) {
+                    //     return Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //       children: List.generate(
+                    //         7,
+                    //         (index) => DayCard(index),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
                     CustomTextField(
                       label: 'Alarm name',
                       icon: Icons.label,

@@ -7,10 +7,10 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'alarm_cubit/alarm_edited_cubit.dart';
 import 'cubit/alarm_cubit.dart';
 import 'cubit/sounds_cubut.dart';
 import 'ui/home/updated_screen.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,13 +40,16 @@ class MyApp extends StatelessWidget {
                 create: (BuildContext context) => AlarmCubit(),
               ),
               BlocProvider<DaySelectionCubit>(
-                create: (BuildContext context) =>  DaySelectionCubit(),
+                create: (BuildContext context) => DaySelectionCubit(),
               ),
               BlocProvider<SoundsCubit>(
-                create: (BuildContext context) =>  SoundsCubit(),
+                create: (BuildContext context) => SoundsCubit(),
               ),
               BlocProvider<UpdatedAlarmsCubit>(
-                create: (BuildContext context) =>  UpdatedAlarmsCubit(),
+                create: (BuildContext context) => UpdatedAlarmsCubit(),
+              ),
+              BlocProvider<EditAlarmCubit>(
+                create: (BuildContext context) => EditAlarmCubit(),
               ),
             ],
             child: MaterialApp(

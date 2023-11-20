@@ -1,6 +1,10 @@
+import 'package:alarmloop/utils/style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../alarm_cubit/alarm_updated_cubit.dart';
 import '../../model/alarm.dart';
+import '../../ui/edit/updated_edited_screen.dart';
 
 class AlarmCard extends StatelessWidget {
   final Alarm alarm;
@@ -9,33 +13,62 @@ class AlarmCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return InkWell(
+      onTap: () {
+        // Navigate to the EditAlarmScreen when the card is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UpdatedEditAlarmForm(),
+          ),
+        );
+      },
+      onLongPress: () {
+        // Show a confirmation dialog when the card is long-pressed
+        _showDeleteConfirmationDialog(context);
+      },
+      child: Container(
+        margin: const EdgeInsets.all(6.0),
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.alarm),
-                Switch(
-                  value: alarm.isOn,
-                  onChanged: (value) {
-                    // Add logic to update the alarm state when the switch is toggled
-                    // For now, just print a message
-                    print('Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          alarm.isAM
+                              ? Icons.wb_sunny_outlined
+                              : Icons.dark_mode_outlined,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          alarm.title,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Switch.adaptive(
+                      value: alarm.isSwitched,
+                      onChanged: (value) {
+                        print(
+                            'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
+                      },
+                    ),
+                  ],
                 ),
+                SizedBox(height: 4),
+                buildDaysRow(alarm.selectedDays),
               ],
             ),
-            Text(
-              alarm.title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-            buildDaysRow(alarm.selectedDays),
-          ],
+          ),
         ),
       ),
     );
@@ -43,27 +76,57 @@ class AlarmCard extends StatelessWidget {
 
   Widget buildDaysRow(String selectedDays) {
     List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: allDays.map((day) {
-          bool isSelected = selectedDays.contains(day);
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Chip(
-              label: Text(
-                day,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : Colors.black,
-                ),
-              ),
-              backgroundColor: isSelected ? Colors.blue : Colors.grey[200],
+    return Row(
+      children: allDays.map((day) {
+        bool isSelected = selectedDays.contains(day);
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          margin: EdgeInsets.only(right: 4.0),
+          child: Text(
+            day,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: isSelected ? Colors.black : Colors.grey,
             ),
-          );
-        }).toList(),
-      ),
+          ),
+        );
+      }).toList(),
     );
   }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Alarm?'),
+          content: Text('Are you sure you want to delete this alarm?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteAlarm(context);
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+ void _deleteAlarm(BuildContext context) {
+  context.read<UpdatedAlarmsCubit>().deleteAlarm(alarm);
+  Navigator.of(context).pop(); // Close the confirmation dialog
+}
+
 }
