@@ -189,7 +189,7 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                     ),
                     foregroundColor: MaterialStateProperty.all(Style.blackClr),
                   ),
-                  onPressed: () {},
+                  onPressed: () => _setAlarm(context),
                   // onPressed: () => _saveAlarm(context),
                   child: Text('Set'),
                 ),
@@ -255,4 +255,54 @@ class UpdatedEditAlarmForm extends StatelessWidget {
   //   // Close the screen
   //   Navigator.pop(context);
   // }
+
+  void _setAlarm(BuildContext context) {
+    // Get the current state using the EditAlarmCubit
+    EditAlarmState state = context.read<EditAlarmCubit>().state;
+
+    // Check if the alarm is set to be turned on
+    if (state.isAM) {
+      // Construct the full DateTime object based on the user's selections
+      DateTime now = DateTime.now();
+      DateTime alarmDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        state.alarmTime.hour,
+        state.alarmTime.minute,
+      );
+
+      // Add the selected days to the alarm
+      List<bool> selectedDaysList =
+          state.selectedDays.split(' ').map((day) => day.isNotEmpty).toList();
+
+      // Loop through each selected day and schedule an alarm
+      for (int i = 0; i < selectedDaysList.length; i++) {
+        if (selectedDaysList[i]) {
+          DateTime scheduledTime =
+              alarmDateTime.add(Duration(days: (i - now.weekday + 7) % 7));
+
+          // TODO: Implement the logic to schedule the alarm using the scheduledTime
+          print('Alarm scheduled for: $scheduledTime');
+        }
+      }
+
+      // Notify the user that the alarm is set
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Alarm set for ${state.alarmTime.format(context)}'),
+        ),
+      );
+
+      // Close the screen
+      Navigator.pop(context);
+    } else {
+      // Notify the user that the alarm is turned off
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Alarm is turned off. Enable it before setting.'),
+        ),
+      );
+    }
+  }
 }

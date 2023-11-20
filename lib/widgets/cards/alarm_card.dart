@@ -74,26 +74,45 @@ class AlarmCard extends StatelessWidget {
     );
   }
 
-  Widget buildDaysRow(String selectedDays) {
-    List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return Row(
-      children: allDays.map((day) {
-        bool isSelected = selectedDays.contains(day);
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 6.0),
-          margin: EdgeInsets.only(right: 4.0),
-          child: Text(
-            day,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              color: isSelected ? Colors.black : Colors.grey,
-            ),
-          ),
-        );
-      }).toList(),
-    );
+  String _getFormattedSelectedDays(String selectedDays) {
+    List<String> daysAbbreviation = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    List<String> selectedDaysList = selectedDays.split(' ');
+
+    String formattedDays = '';
+    for (int i = 0; i < daysAbbreviation.length; i++) {
+      if (selectedDaysList[i] == '1') {
+        formattedDays += daysAbbreviation[i] + ' ';
+      }
+    }
+
+    return formattedDays.trim();
   }
+  
+ Widget buildDaysRow(String selectedDays) {
+  List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  return Row(
+    children: allDays.map((day) {
+      bool isSelected = selectedDays.contains(day);
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 6.0),
+        margin: EdgeInsets.only(right: 4.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4.0),
+          color: isSelected ? Colors.blue : Colors.grey.withOpacity(0.3),
+        ),
+        child: Text(
+          day,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            color: isSelected ? Colors.white : Colors.black,
+          ),
+        ),
+      );
+    }).toList(),
+  );
+}
+
 
   void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
