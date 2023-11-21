@@ -32,7 +32,10 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
           fontSize: 20.sp,
           fontWeight: FontWeight.w500,
         ),
-        title: const Text('Alarm'),
+        title: Text(
+          'Alarm',
+          style: Style.textStyleBtn(),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -53,20 +56,10 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Style.greyColor,
-        onPressed: () async {
-          // Create a new alarm (you can replace this with your own logic to create alarms)
-          Alarm newAlarm = Alarm(
-              selectedDays: 'F T T M W S',
-              isSwitched: false,
-              hour: 10,
-              isAM: true,
-              title: 'Alarm',
-              minute: 10,
-              period: '10');
-
-          // Add the new alarm to the list and save it to SharedPreferences
-          await context.read<UpdatedAlarmsCubit>().addAlarm(newAlarm);
-        },
+        onPressed: () => Navigator.pushNamed(
+          context,
+          UpdatedEditAlarmForm.routeName,
+        ),
         child: Icon(Icons.alarm_add),
       ),
     );

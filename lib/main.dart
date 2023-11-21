@@ -10,7 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'alarm_cubit/alarm_edited_cubit.dart';
 import 'cubit/alarm_cubit.dart';
 import 'cubit/sounds_cubut.dart';
-import 'ui/home/updated_screen.dart';
+import 'ui/home/updated_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

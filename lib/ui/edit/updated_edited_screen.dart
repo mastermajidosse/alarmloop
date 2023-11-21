@@ -1,18 +1,20 @@
+import 'package:alarmloop/ui/home/updated_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../alarm_cubit/alarm_edited_cubit.dart';
 import '../../alarm_cubit/alarm_edited_state.dart';
 import '../../alarm_cubit/alarm_updated_cubit.dart';
-import '../../cubit/alarm_cubit.dart';
 import '../../cubit/day_selection_cubit.dart';
 import '../../cubit/day_selection_state.dart';
-import '../../model/alarm_model.dart';
+import '../../model/alarm.dart';
 import '../../utils/style.dart';
 import '../../widgets/custom_card.dart';
 
 // ignore: must_be_immutable
 class UpdatedEditAlarmForm extends StatelessWidget {
+  static String routeName = "/update-edited-screen";
+
   String title = ''; // Use TextEditingController for better management
   bool isOn = true;
   bool isPm = false;
@@ -23,13 +25,19 @@ class UpdatedEditAlarmForm extends StatelessWidget {
     return Scaffold(
       backgroundColor: Style.whiteClr,
       appBar: AppBar(
+        leading: BackButton(
+          color: Style.blackClr,
+        ),
         backgroundColor: Colors.white,
         titleTextStyle: TextStyle(
           color: Style.blackClr,
           fontSize: 20.sp,
           fontWeight: FontWeight.w500,
         ),
-        title: const Text('Set Alarm'),
+        title: Text(
+          'Set Alarm',
+          style: Style.textStyleBtn(),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -74,23 +82,17 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                             .setAlarmTime(selectedTime!);
                       },
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            state.alarmTime.hour.toString() +
-                                ':' +
-                                state.alarmTime.minute.toString(),
-                            style: TextStyle(
-                              fontSize: 40.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                              state.alarmTime.hour.toString() +
+                                  ':' +
+                                  state.alarmTime.minute.toString(),
+                              style: Style.clockStyle()),
                           SizedBox(width: 10),
                           Text(
                             state.isAM ? 'AM' : 'PM',
-                            style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Style.textStyleBtn(),
                           ),
                         ],
                       ),
@@ -101,7 +103,7 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                     ),
                   ],
                 ),
-                Image.asset('assets/images/clock.png'),
+                Image.asset('assets/images/horloge.png'),
                 // Dynamic days selection
                 BlocBuilder<DaySelectionCubit, DaySelectionState>(
                   builder: (context, state) {
@@ -131,7 +133,10 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                                 .setTimeOfDay(!state.isAM);
                           },
                         ),
-                        Text(state.isAM ? 'AM' : 'PM'),
+                        Text(
+                          state.isAM ? 'AM' : 'PM',
+                          style: Style.textStyleBtn(),
+                        ),
                       ],
                     ),
 
@@ -168,20 +173,26 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                     // ),
                     Row(
                       children: [
-                        Text('Off'),
+                        Text(
+                          'Off',
+                          style: Style.textStyleBtn(),
+                        ),
                         Switch(
                           value: state.isSwitched,
                           onChanged: (value) {
                             context.read<EditAlarmCubit>().setSwitch(value);
                           },
                         ),
-                        Text('On'),
+                        Text(
+                          'On',
+                          style: Style.textStyleBtn(),
+                        ),
                       ],
                     ),
                   ],
                 ),
                 SizedBox(height: 32.0),
-                ElevatedButton(
+                TextButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Style.whiteClr),
                     textStyle: MaterialStateProperty.all(
@@ -189,9 +200,41 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                     ),
                     foregroundColor: MaterialStateProperty.all(Style.blackClr),
                   ),
-                  onPressed: () => _setAlarm(context),
+                  onPressed: () async {
+                    // Create a new alarm
+                    Alarm newAlarm = Alarm(
+                      selectedDays: 'F T T M S',
+                      isSwitched: false,
+                      hour: 10,
+                      isAM: true,
+                      title: 'Alarm',
+                      minute: 10,
+                      period: '10',
+                    );
+
+                    // Navigate to the edit screen and get the selected days
+                    List<bool>? selectedDays = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UpdatedHomeScreen(),
+                      ),
+                    );
+
+                    // If selectedDays is not null, it means the user selected days
+                    if (selectedDays != null) {
+                      // Do something with the selected days, e.g., update the UI
+                      print('Selected Days in HomeScreen: $selectedDays');
+                    }
+
+                    // Add the new alarm to the list and save it to SharedPreferences
+                    await context.read<UpdatedAlarmsCubit>().addAlarm(newAlarm);
+                    Navigator.pop(context);
+                  },
                   // onPressed: () => _saveAlarm(context),
-                  child: Text('Set'),
+                  child: Text(
+                    'SET',
+                    style: Style.textStyleBtn(),
+                  ),
                 ),
               ],
             ),
@@ -261,7 +304,7 @@ class UpdatedEditAlarmForm extends StatelessWidget {
     EditAlarmState state = context.read<EditAlarmCubit>().state;
 
     // Check if the alarm is set to be turned on
-    if (state.isAM) {
+    if (state.isSwitched) {
       // Construct the full DateTime object based on the user's selections
       DateTime now = DateTime.now();
       DateTime alarmDateTime = DateTime(
@@ -294,6 +337,12 @@ class UpdatedEditAlarmForm extends StatelessWidget {
         ),
       );
 
+      // Toggle the day selection
+
+      // Log the selected days
+      List<bool> selectedDays =
+          context.read<DaySelectionCubit>().state.selectedDays;
+      print('Selected Days: $selectedDays');
       // Close the screen
       Navigator.pop(context);
     } else {

@@ -49,9 +49,8 @@ class AlarmCard extends StatelessWidget {
                           width: 8,
                         ),
                         Text(
-                          alarm.title,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          alarm.hour.toString() + ":" + alarm.minute.toString(),
+                          style: Style.clockStyle(),
                         ),
                       ],
                     ),
@@ -75,44 +74,39 @@ class AlarmCard extends StatelessWidget {
   }
 
   String _getFormattedSelectedDays(String selectedDays) {
-    List<String> daysAbbreviation = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    List<String> daysAbbreviation = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     List<String> selectedDaysList = selectedDays.split(' ');
+
+    List<String> daysNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     String formattedDays = '';
     for (int i = 0; i < daysAbbreviation.length; i++) {
       if (selectedDaysList[i] == '1') {
-        formattedDays += daysAbbreviation[i] + ' ';
+        formattedDays += '${daysNames[i]} ';
       }
     }
 
     return formattedDays.trim();
   }
-  
- Widget buildDaysRow(String selectedDays) {
-  List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  return Row(
-    children: allDays.map((day) {
-      bool isSelected = selectedDays.contains(day);
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 6.0),
-        margin: EdgeInsets.only(right: 4.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4.0),
-          color: isSelected ? Colors.blue : Colors.grey.withOpacity(0.3),
-        ),
-        child: Text(
-          day,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-            color: isSelected ? Colors.white : Colors.black,
-          ),
-        ),
-      );
-    }).toList(),
-  );
-}
 
+  Widget buildDaysRow(String selectedDays) {
+    List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return Row(
+      children: allDays.map((day) {
+        bool isSelected = selectedDays.contains(day);
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          margin: EdgeInsets.only(right: 4.0),
+          child: Text(
+            day,
+            style: isSelected
+                ? Style.isSelectedDayStyle()
+                : Style.isNotSelectedDayStyle(),
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
@@ -124,7 +118,7 @@ class AlarmCard extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
@@ -143,9 +137,8 @@ class AlarmCard extends StatelessWidget {
     );
   }
 
- void _deleteAlarm(BuildContext context) {
-  context.read<UpdatedAlarmsCubit>().deleteAlarm(alarm);
-  Navigator.of(context).pop(); // Close the confirmation dialog
-}
-
+  void _deleteAlarm(BuildContext context) {
+    context.read<UpdatedAlarmsCubit>().deleteAlarm(alarm);
+    Navigator.of(context).pop(); // Close the confirmation dialog
+  }
 }

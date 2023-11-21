@@ -1,4 +1,4 @@
-import 'package:alarmloop/ui/home/updated_screen.dart';
+import 'package:alarmloop/ui/home/updated_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
