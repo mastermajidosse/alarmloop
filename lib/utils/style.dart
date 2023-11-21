@@ -7,6 +7,7 @@ class Style {
   static Color blackClr = Colors.black;
   static Color greyColor = Colors.grey;
   static Color whiteClr = Colors.white;
+  static Color greenClr = Colors.green;
 
   static TextStyle textStyleBtn() => TextStyle(
         fontFamily: barlow,

@@ -182,6 +182,10 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                           onChanged: (value) {
                             context.read<EditAlarmCubit>().setSwitch(value);
                           },
+                          activeTrackColor: Style.blackClr,
+                          activeColor: Style.greenClr,
+                          inactiveThumbColor: Style.blackClr,
+                          inactiveTrackColor: Style.greyColor,
                         ),
                         Text(
                           'On',
@@ -203,29 +207,15 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                   onPressed: () async {
                     // Create a new alarm
                     Alarm newAlarm = Alarm(
-                      selectedDays: 'F T T M S',
-                      isSwitched: false,
-                      hour: 10,
-                      isAM: true,
+                      selectedDays: state.selectedDays,
+                      isSwitched: state.isSwitched,
+                      hour: state.alarmTime.hour,
+                      isAM: state.isAM,
                       title: 'Alarm',
-                      minute: 10,
-                      period: '10',
+                      minute: state.alarmTime.minute,
+                      period: state.alarmTime.period.toString(),
                     );
-
-                    // Navigate to the edit screen and get the selected days
-                    List<bool>? selectedDays = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UpdatedHomeScreen(),
-                      ),
-                    );
-
-                    // If selectedDays is not null, it means the user selected days
-                    if (selectedDays != null) {
-                      // Do something with the selected days, e.g., update the UI
-                      print('Selected Days in HomeScreen: $selectedDays');
-                    }
-
+                      print('Selected Days in HomeScreen: ${state.selectedDays}');
                     // Add the new alarm to the list and save it to SharedPreferences
                     await context.read<UpdatedAlarmsCubit>().addAlarm(newAlarm);
                     Navigator.pop(context);

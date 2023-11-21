@@ -60,6 +60,10 @@ class AlarmCard extends StatelessWidget {
                         print(
                             'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
                       },
+                      activeTrackColor: Style.blackClr,
+                      activeColor: Style.greenClr,
+                      inactiveThumbColor: Style.blackClr,
+                      inactiveTrackColor: Style.greyColor,
                     ),
                   ],
                 ),
