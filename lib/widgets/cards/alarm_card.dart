@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../alarm_cubit/alarm_updated_cubit.dart';
+import '../../core/core.dart';
 import '../../model/alarm.dart';
 import '../../ui/edit/updated_edited_screen.dart';
 
@@ -25,7 +26,7 @@ class AlarmCard extends StatelessWidget {
       },
       onLongPress: () {
         // Show a confirmation dialog when the card is long-pressed
-        _showDeleteConfirmationDialog(context);
+        showDeleteConfirmationDialog(context,alarm);
       },
       child: Container(
         margin: const EdgeInsets.all(6.0),
@@ -77,72 +78,4 @@ class AlarmCard extends StatelessWidget {
     );
   }
 
-  String _getFormattedSelectedDays(String selectedDays) {
-    List<String> daysAbbreviation = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    List<String> selectedDaysList = selectedDays.split(' ');
-
-    List<String> daysNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-    String formattedDays = '';
-    for (int i = 0; i < daysAbbreviation.length; i++) {
-      if (selectedDaysList[i] == '1') {
-        formattedDays += '${daysNames[i]} ';
-      }
-    }
-
-    return formattedDays.trim();
-  }
-
-  Widget buildDaysRow(String selectedDays) {
-    List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return Row(
-      children: allDays.map((day) {
-        bool isSelected = selectedDays.contains(day);
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 6.0),
-          margin: EdgeInsets.only(right: 4.0),
-          child: Text(
-            day,
-            style: isSelected
-                ? Style.isSelectedDayStyle()
-                : Style.isNotSelectedDayStyle(),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  void _showDeleteConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Alarm?'),
-          content: Text('Are you sure you want to delete this alarm?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteAlarm(context);
-              },
-              child: Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteAlarm(BuildContext context) {
-    context.read<UpdatedAlarmsCubit>().deleteAlarm(alarm);
-    Navigator.of(context).pop(); // Close the confirmation dialog
-  }
 }

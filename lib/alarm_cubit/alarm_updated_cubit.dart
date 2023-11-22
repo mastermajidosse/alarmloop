@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:alarmloop/alarm_cubit/alarm_updated_state.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,9 +59,10 @@ class UpdatedAlarmsCubit extends Cubit<UpdatedAlarmsState> {
     emit(UpdatedAlarmsState(updatedAlarms, []));
   }
 
-  void updateSelectedDays(String newSelectedDays) {
+  void updateSelectedDays(String newSelectedDays,index) {
     List<Alarm> updatedAlarms = state.alarms.map((alarm) {
       return Alarm(
+        id: index,
         title: alarm.title,
         selectedDays: newSelectedDays,
         isAM: alarm.isAM,
@@ -83,6 +85,7 @@ class UpdatedAlarmsCubit extends Cubit<UpdatedAlarmsState> {
 
     // Create a new Alarm instance with updated selectedDays
     Alarm updatedAlarm = Alarm(
+      id: alarmIndex,
       isSwitched: oldAlarm.isSwitched,
       isAM: oldAlarm.isAM,
       title: oldAlarm.title,
@@ -99,5 +102,28 @@ class UpdatedAlarmsCubit extends Cubit<UpdatedAlarmsState> {
     print('Invalid alarm index: $alarmIndex');
   }
 }
+
+void updateAlarm(Alarm updatedAlarm, int index, BuildContext context) async {
+    // Fetch existing alarms from SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? alarmStrings = prefs.getStringList('alarms');
+
+    List<Alarm> _alarms = alarmStrings != null
+        ? alarmStrings.map((json) => Alarm.fromJson(jsonDecode(json))).toList()
+        : [];
+
+    // Update the existing alarm in the list
+    if (index != -1 && index < _alarms.length && index != null) {
+      _alarms[index] = updatedAlarm;
+    } else {
+      // Handle the case where the index is not valid (optional)
+    }
+
+    List<String> updatedAlarmStrings =
+        _alarms.map((alarm) => jsonEncode(alarm.toJson())).toList();
+    await prefs.setStringList('alarms', updatedAlarmStrings);
+
+    Navigator.pop(context, updatedAlarm);
+  }
 
 }

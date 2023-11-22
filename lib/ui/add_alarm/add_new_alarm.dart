@@ -1,3 +1,4 @@
+import 'package:alarmloop/ui/home/updated_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,13 +8,12 @@ import '../../alarm_cubit/alarm_updated_cubit.dart';
 import '../../cubit/day_selection_cubit.dart';
 import '../../cubit/day_selection_state.dart';
 import '../../model/alarm.dart';
-import '../../model/args_model.dart';
 import '../../utils/style.dart';
 import '../../widgets/custom_card.dart';
 
 // ignore: must_be_immutable
-class UpdatedEditAlarmForm extends StatelessWidget {
-  static String routeName = "/update-edited-screen";
+class AddNewAlarmScreen extends StatelessWidget {
+  static String routeName = "/add-newAlarm-screen";
 
   String title = ''; // Use TextEditingController for better management
   bool isOn = true;
@@ -22,12 +22,6 @@ class UpdatedEditAlarmForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AlarmEditArguments args =
-        ModalRoute.of(context)!.settings.arguments as AlarmEditArguments;
-    final Alarm? alarm = args.alarm;
-    final int? index = args.index;
-    print("ALARM::>${alarm!.hour}:${alarm.minute}");
-    print("ALARM::>$index");
     return Scaffold(
       backgroundColor: Style.whiteClr,
       appBar: AppBar(
@@ -210,18 +204,22 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                     ),
                     foregroundColor: MaterialStateProperty.all(Style.blackClr),
                   ),
-                  onPressed: () {
-                    final newAlarm = Alarm(
+                  onPressed: () async {
+                    // Create a new alarm
+                    Alarm newAlarm = Alarm(
                       id: state.id,
-                      title: '',
                       selectedDays: state.selectedDays,
                       isSwitched: state.isSwitched,
-                      isAM: state.isAM,
                       hour: state.alarmTime.hour,
+                      isAM: state.isAM,
+                      title: 'Alarm',
                       minute: state.alarmTime.minute,
                       period: state.alarmTime.period.toString(),
                     );
-                    context.read<UpdatedAlarmsCubit>().updateAlarm(newAlarm,index!,context,);
+                      print('Selected Days in HomeScreen: ${state.selectedDays}');
+                    // Add the new alarm to the list and save it to SharedPreferences
+                    await context.read<UpdatedAlarmsCubit>().addAlarm(newAlarm);
+                    Navigator.pop(context);
                   },
                   // onPressed: () => _saveAlarm(context),
                   child: Text(

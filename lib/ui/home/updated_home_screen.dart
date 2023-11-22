@@ -1,15 +1,15 @@
-import 'package:alarmloop/model/sound_model.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../alarm_cubit/alarm_updated_cubit.dart';
 import '../../alarm_cubit/alarm_updated_state.dart';
-import '../../cubit/alarm_cubit.dart';
+import '../../alarm_cubit/update/update_alarm_cubit.dart';
+import '../../core/core.dart';
 import '../../model/alarm.dart';
-import '../../model/alarm_model.dart';
-import '../../utils/demo_data.dart';
+import '../../model/args_model.dart';
 import '../../widgets/cards/alarm_card.dart';
+import '../add_alarm/add_new_alarm.dart';
 import '../edit/updated_edited_screen.dart';
 
 class UpdatedHomeScreen extends StatefulWidget {
@@ -45,11 +45,79 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
             context.read<UpdatedAlarmsCubit>().loadAlarms();
           }
           return state.alarms.isEmpty
-              ? _buildEmptyState()
+              ? buildEmptyState(context)
               : ListView.builder(
                   itemCount: state.alarms.length,
                   itemBuilder: (context, index) {
-                    return AlarmCard(alarm: state.alarms[index]);
+                    final alarm = state.alarms[index];
+                    return InkWell(
+                      onTap: () async {
+                        final updatedAlarm = await Navigator.pushNamed(
+                          context,
+                          UpdatedEditAlarmForm.routeName,
+                          arguments:
+                              AlarmEditArguments(alarm: alarm, index: index),
+                        );
+                        print("udapted::::::::::::>$updatedAlarm");
+                        if (updatedAlarm != null) {
+                            context.read<AlarmsCubitUpdated>().updateAlarm(updatedAlarm as Alarm);
+                        }
+                      },
+                      onLongPress: () {
+                        // Show a confirmation dialog when the card is long-pressed
+                        showDeleteConfirmationDialog(context, alarm);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(6.0),
+                        child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          alarm.isAM
+                                              ? Icons.wb_sunny_outlined
+                                              : Icons.dark_mode_outlined,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          alarm.hour.toString() +
+                                              ":" +
+                                              alarm.minute.toString(),
+                                          style: Style.clockStyle(),
+                                        ),
+                                      ],
+                                    ),
+                                    Switch.adaptive(
+                                      value: alarm.isSwitched,
+                                      onChanged: (value) {
+                                        print(
+                                            'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
+                                      },
+                                      activeTrackColor: Style.blackClr,
+                                      activeColor: Style.greenClr,
+                                      inactiveThumbColor: Style.blackClr,
+                                      inactiveTrackColor: Style.greyColor,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                buildDaysRow(alarm.selectedDays),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 );
         },
@@ -58,36 +126,9 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
         backgroundColor: Style.greyColor,
         onPressed: () => Navigator.pushNamed(
           context,
-          UpdatedEditAlarmForm.routeName,
+          AddNewAlarmScreen.routeName,
         ),
         child: Icon(Icons.alarm_add),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'No alarms yet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Handle the button press to add a new alarm
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UpdatedEditAlarmForm(),
-                ),
-              );
-            },
-            child: Text('Add Alarm'),
-          ),
-        ],
       ),
     );
   }

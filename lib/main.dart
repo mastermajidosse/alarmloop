@@ -1,6 +1,5 @@
 import 'package:alarmloop/alarm_cubit/alarm_updated_cubit.dart';
 import 'package:alarmloop/cubit/day_selection_cubit.dart';
-import 'package:alarmloop/ui/home/home_screen.dart';
 import 'package:alarmloop/ui/home/splash_screen.dart';
 import 'package:alarmloop/utils/routes.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -8,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'alarm_cubit/alarm_edited_cubit.dart';
+import 'alarm_cubit/update/update_alarm_cubit.dart';
 import 'cubit/alarm_cubit.dart';
 import 'cubit/sounds_cubut.dart';
-import 'ui/home/updated_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +49,9 @@ class MyApp extends StatelessWidget {
               ),
               BlocProvider<EditAlarmCubit>(
                 create: (BuildContext context) => EditAlarmCubit(),
+              ),
+              BlocProvider<AlarmsCubitUpdated>(
+                create: (BuildContext context) => AlarmsCubitUpdated(),
               ),
             ],
             child: MaterialApp(
