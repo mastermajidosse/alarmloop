@@ -6,7 +6,7 @@ import '../alarm_cubit/alarm_updated_cubit.dart';
 import '../ui/edit/updated_edited_screen.dart';
 import '../utils/style.dart';
 
-String _getFormattedSelectedDays(String selectedDays) {
+String getFormattedSelectedDays(String selectedDays) {
     List<String> daysAbbreviation = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     List<String> selectedDaysList = selectedDays.split(' ');
 

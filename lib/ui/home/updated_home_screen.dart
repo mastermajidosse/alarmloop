@@ -6,9 +6,12 @@ import '../../alarm_cubit/alarm_updated_cubit.dart';
 import '../../alarm_cubit/alarm_updated_state.dart';
 import '../../alarm_cubit/update/update_alarm_cubit.dart';
 import '../../core/core.dart';
+import '../../cubit/day_selection_cubit.dart';
+import '../../cubit/day_selection_state.dart';
 import '../../model/alarm.dart';
 import '../../model/args_model.dart';
 import '../../widgets/cards/alarm_card.dart';
+import '../../widgets/custom_card.dart';
 import '../add_alarm/add_new_alarm.dart';
 import '../edit/updated_edited_screen.dart';
 
@@ -60,7 +63,9 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                         );
                         print("udapted::::::::::::>$updatedAlarm");
                         if (updatedAlarm != null) {
-                            context.read<AlarmsCubitUpdated>().updateAlarm(updatedAlarm as Alarm);
+                          context
+                              .read<AlarmsCubitUpdated>()
+                              .updateAlarm(updatedAlarm as Alarm);
                         }
                       },
                       onLongPress: () {
@@ -111,7 +116,31 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                   ],
                                 ),
                                 SizedBox(height: 4),
-                                buildDaysRow(alarm.selectedDays),
+                                BlocBuilder<DaySelectionCubit,
+                                    DaySelectionState>(
+                                  builder: (context, daySelectionState) {
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: List.generate(
+                                        7,
+                                        (index) => GestureDetector(
+                                          onTap: () {
+                                            context
+                                                .read<DaySelectionCubit>()
+                                                .toggleDay(index);
+                                          },
+                                          child: DayCard(
+                                            index:index,
+                                            dayIndex: index,
+                                            alarmIndex: index,
+                                            isHome: true,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -130,6 +159,25 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
         ),
         child: Icon(Icons.alarm_add),
       ),
+    );
+  }
+
+  Widget buildDaysRow(String selectedDays) {
+    List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return Row(
+      children: allDays.map((day) {
+        bool isSelected = selectedDays.contains(day);
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          margin: EdgeInsets.only(right: 4.0),
+          child: Text(
+            day,
+            style: isSelected
+                ? Style.isSelectedDayStyle()
+                : Style.isNotSelectedDayStyle(),
+          ),
+        );
+      }).toList(),
     );
   }
 }

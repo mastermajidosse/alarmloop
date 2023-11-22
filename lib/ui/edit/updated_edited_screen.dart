@@ -117,7 +117,7 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: List.generate(
                         7,
-                        (index) => DayCard(dayIndex: index, alarmIndex: index),
+                        (index) => DayCard(isHome: false,dayIndex: index, alarmIndex: index,index: index,),
                       ),
                     );
                   },

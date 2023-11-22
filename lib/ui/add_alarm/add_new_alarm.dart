@@ -111,7 +111,7 @@ class AddNewAlarmScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: List.generate(
                         7,
-                        (index) => DayCard(dayIndex: index, alarmIndex: index),
+                        (index) => DayCard(dayIndex: index, alarmIndex: index,isHome: false,index: index,),
                       ),
                     );
                   },

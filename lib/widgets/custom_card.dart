@@ -4,16 +4,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../alarm_cubit/alarm_updated_cubit.dart';
 import '../cubit/day_selection_cubit.dart';
+import '../utils/style.dart';
 
 class DayCard extends StatelessWidget {
-   final int dayIndex;
+  final int index;
+  final bool isHome;
+  final int dayIndex;
   final int alarmIndex;
 
   const DayCard({
+    required this.isHome,
+    required this.index,
     required this.dayIndex,
     required this.alarmIndex,
   });
-
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +26,22 @@ class DayCard extends StatelessWidget {
         // Dispatch the toggleDay event when the card is tapped
         context.read<DaySelectionCubit>().toggleDay(dayIndex);
 
-        // Get the selected days from the DaySelectionCubit
-        List<bool> selectedDays =
-            context.read<DaySelectionCubit>().state.selectedDays;
+        // Check if it's a home card and do something specific
+        if (isHome) {
+          // Get the selected days from the DaySelectionCubit
+          List<bool> selectedDays =
+              context.read<DaySelectionCubit>().state.selectedDays;
 
-        // Update the selected days of the corresponding alarm in UpdatedAlarmsCubit
-        context
-            .read<UpdatedAlarmsCubit>()
-            .updateAlarmSelectedDays(alarmIndex, selectedDays);
+          // Update the selected days of the corresponding alarm in UpdatedAlarmsCubit
+          context
+              .read<UpdatedAlarmsCubit>()
+              .updateAlarmSelectedDays(alarmIndex, selectedDays);
+        }
       },
       child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
         builder: (context, state) {
-          final isSelected = state.selectedDays[dayIndex];
+          final isSelected =
+              context.read<DaySelectionCubit>().isSelected(dayIndex);
 
           return Container(
             width: 40.0,
@@ -58,24 +66,24 @@ class DayCard extends StatelessWidget {
     );
   }
 
-   String getDayAbbreviation(int index) {
+  String getDayAbbreviation(int index) {
     // Adjust the index to start from Monday
     final dayIndex = (index + 1) % 7;
     switch (dayIndex) {
       case 0:
-        return 'Mon';
+        return 'M';
       case 1:
-        return 'Tue';
+        return 'T';
       case 2:
-        return 'Wed';
+        return 'W';
       case 3:
-        return 'Thu';
+        return 'T';
       case 4:
-        return 'Fri';
+        return 'F';
       case 5:
-        return 'Sat';
+        return 'S';
       case 6:
-        return 'Sun';
+        return 'S';
       default:
         return '';
     }
