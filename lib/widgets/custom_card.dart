@@ -21,49 +21,51 @@ class DayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Dispatch the toggleDay event when the card is tapped
-        context.read<DaySelectionCubit>().toggleDay(dayIndex);
+    return isHome
+        ? GestureDetector(
+            onTap: () {
+              // Dispatch the toggleDay event when the card is tapped
+              context.read<DaySelectionCubit>().toggleDay(dayIndex);
+            },
+            child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
+              builder: (context, state) {
+                final isSelected =
+                    context.read<DaySelectionCubit>().isSelected(dayIndex);
 
-        // Check if it's a home card and do something specific
-        if (isHome) {
-          // Get the selected days from the DaySelectionCubit
-          List<bool> selectedDays =
-              context.read<DaySelectionCubit>().state.selectedDays;
-
-          // Update the selected days of the corresponding alarm in UpdatedAlarmsCubit
-          context
-              .read<UpdatedAlarmsCubit>()
-              .updateAlarmSelectedDays(alarmIndex, selectedDays);
-        }
-      },
-      child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
-        builder: (context, state) {
-          final isSelected =
-              context.read<DaySelectionCubit>().isSelected(dayIndex);
-
-          return Container(
-            width: 40.0,
-            height: 40.0,
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.blue : Colors.grey.shade200,
-              border: Border.all(width: 1.0, color: Colors.grey),
-              borderRadius: BorderRadius.circular(8.0),
+                return Center(
+                  child: Text(
+                    getDayAbbreviation(dayIndex),
+                    style: TextStyle(
+                      color: isSelected ? Style.greyColor : Style.blackClr,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
             ),
-            child: Center(
-              child: Text(
-                getDayAbbreviation(dayIndex),
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          )
+        : GestureDetector(
+            onTap: () {
+              // Dispatch the toggleDay event when the card is tapped
+              context.read<DaySelectionCubit>().toggleDay(dayIndex);
+            },
+            child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
+              builder: (context, state) {
+                final isSelected =
+                    context.read<DaySelectionCubit>().isSelected(dayIndex);
+
+                return Center(
+                  child: Text(
+                    getDayAbbreviation(dayIndex),
+                    style: TextStyle(
+                      color: isSelected ? Style.greyColor : Style.blackClr,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
-    );
   }
 
   String getDayAbbreviation(int index) {
