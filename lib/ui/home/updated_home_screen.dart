@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../alarm_cubit/update/update_alarm_cubit.dart';
 import '../../core/core.dart';
+import '../../core/notifier.dart';
 import '../../cubit/alarm_cubit.dart';
 import '../../cubit/day_selection_cubit.dart';
 import '../../cubit/day_selection_state.dart';
@@ -24,6 +25,20 @@ class UpdatedHomeScreen extends StatefulWidget {
 
 class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
   // late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  @override
+  void initState() {
+    // Only after at least the action method is set, the notification events are delivered
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onDismissActionReceivedMethod);
+
+    super.initState();
+  }
 
   // @override
   // void initState() {
@@ -139,11 +154,12 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                 onPressed: () {
                   AwesomeNotifications().createNotification(
                       content: NotificationContent(
+                    badge: 1,
                     id: 10,
                     channelKey: 'basic_channel',
                     actionType: ActionType.Default,
-                    title: 'Hello World!',
-                    body: 'This is my first notification!',
+                    title: 'Ringing Alarm',
+                    body: 'Time of ringing the alarm',
                   ));
                   // scheduleAlarm(1, 'title', 'body', 1, 9, 8);
                 },
