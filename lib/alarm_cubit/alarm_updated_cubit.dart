@@ -59,51 +59,50 @@ class UpdatedAlarmsCubit extends Cubit<UpdatedAlarmsState> {
     emit(UpdatedAlarmsState(updatedAlarms, []));
   }
 
-  void updateSelectedDays(String newSelectedDays,index) {
+  void updateSelectedDays(String newSelectedDays, index) {
     List<Alarm> updatedAlarms = state.alarms.map((alarm) {
       return Alarm(
-        id: index,
-        title: alarm.title,
-        selectedDays: newSelectedDays,
-        isAM: alarm.isAM,
-        isSwitched: alarm.isSwitched,
-        hour: alarm.hour,
-        minute: alarm.minute,
-        period: alarm.period,
+        index,
+        alarm.title,
+        newSelectedDays,
+        alarm.isAM,
+        alarm.isSwitched,
+        alarm.hour,
+        alarm.minute,
+        alarm.period,
       );
     }).toList();
 
     emit(UpdatedAlarmsState(updatedAlarms, newSelectedDays));
   }
 
- void updateAlarmSelectedDays(int alarmIndex, List<bool> newSelectedDays) {
-  List<Alarm> updatedAlarms = List.from(state.alarms);
+  void updateAlarmSelectedDays(int alarmIndex, List<bool> newSelectedDays) {
+    List<Alarm> updatedAlarms = List.from(state.alarms);
 
-  // Check if alarmIndex is within the valid range
-  if (alarmIndex >= 0 && alarmIndex < updatedAlarms.length) {
-    Alarm oldAlarm = updatedAlarms[alarmIndex];
+    // Check if alarmIndex is within the valid range
+    if (alarmIndex >= 0 && alarmIndex < updatedAlarms.length) {
+      Alarm oldAlarm = updatedAlarms[alarmIndex];
 
-    // Create a new Alarm instance with updated selectedDays
-    Alarm updatedAlarm = Alarm(
-      id: alarmIndex,
-      isSwitched: oldAlarm.isSwitched,
-      isAM: oldAlarm.isAM,
-      title: oldAlarm.title,
-      selectedDays:
-          newSelectedDays.map((selected) => selected ? '1' : '0').join(' '),
-      hour: oldAlarm.hour,
-      minute: oldAlarm.minute,
-      period: oldAlarm.period,
-    );
+      // Create a new Alarm instance with updated selectedDays
+      Alarm updatedAlarm = Alarm(
+        alarmIndex,
+        oldAlarm.title,
+        newSelectedDays.map((selected) => selected ? '1' : '0').join(' '),
+        oldAlarm.isSwitched,
+        oldAlarm.isAM,
+        oldAlarm.hour,
+        oldAlarm.minute,
+        oldAlarm.period,
+      );
 
-    updatedAlarms[alarmIndex] = updatedAlarm;
-    emit(UpdatedAlarmsState(updatedAlarms, ''));
-  } else {
-    print('Invalid alarm index: $alarmIndex');
+      updatedAlarms[alarmIndex] = updatedAlarm;
+      emit(UpdatedAlarmsState(updatedAlarms, ''));
+    } else {
+      print('Invalid alarm index: $alarmIndex');
+    }
   }
-}
 
-void updateAlarm(Alarm updatedAlarm, int index, BuildContext context) async {
+  void updateAlarm(Alarm updatedAlarm, int index, BuildContext context) async {
     // Fetch existing alarms from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? alarmStrings = prefs.getStringList('alarms');
@@ -125,5 +124,4 @@ void updateAlarm(Alarm updatedAlarm, int index, BuildContext context) async {
 
     Navigator.pop(context, updatedAlarm);
   }
-
 }

@@ -1,14 +1,10 @@
-import 'package:alarmloop/cubit/day_selection_state.dart';
 import 'package:alarmloop/model/alarm_model.dart';
 import 'package:alarmloop/ui/choose_alarm/choose_alarm_screen.dart';
-import 'package:alarmloop/widgets/custom_card.dart';
 import 'package:alarmloop/widgets/inputs/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../cubit/alarm_cubit.dart';
-import '../../cubit/day_selection_cubit.dart';
 import '../../widgets/button/icon_button.dart';
 import '../../widgets/button/my_chip.dart';
 

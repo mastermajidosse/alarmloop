@@ -13,9 +13,9 @@ import '../ui/home/updated_home_screen.dart';
 final Map<String, WidgetBuilder> routes = {
   HomeScreen.routeName: (context) => const HomeScreen(),
   SplashScreen.routeName: (context) =>  SplashScreen(),
-  UpdatedHomeScreen.routeName: (context) => const UpdatedHomeScreen(),
+  UpdatedHomeScreen.routeName: (context) =>  UpdatedHomeScreen(),
   EditScreen.routeName: (context) => const EditScreen(),
   ChooseAlarmScreen.routeName: (context) => const ChooseAlarmScreen(),
   UpdatedEditAlarmForm.routeName: (context) =>  UpdatedEditAlarmForm(),
-  AddNewAlarmScreen.routeName: (context) =>  AddNewAlarmScreen(),
+  // AddNewAlarmScreen.routeName: (context) =>  AddNewAlarmScreen(),
 };

@@ -36,11 +36,11 @@ class EditAlarmState {
 
   factory EditAlarmState.fromAlarm(Alarm alarm) {
     return EditAlarmState(
-      id: alarm.id,
-      isAM: alarm.isAM,
-      alarmTime: TimeOfDay(hour: alarm.hour, minute: alarm.minute),
-      selectedDays: alarm.selectedDays,
-      isSwitched: alarm.isSwitched,
+      id: alarm.id!,
+      isAM: alarm.isAM!,
+      alarmTime: TimeOfDay(hour: alarm.hour!, minute: alarm.minute!),
+      selectedDays: alarm.selectedDays!,
+      isSwitched: alarm.isSwitched!,
     );
   }
 }

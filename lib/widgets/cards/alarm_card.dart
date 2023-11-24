@@ -1,3 +1,4 @@
+import 'package:alarmloop/model/alarm_model.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +9,7 @@ import '../../model/alarm.dart';
 import '../../ui/edit/updated_edited_screen.dart';
 
 class AlarmCard extends StatelessWidget {
-  final Alarm alarm;
+  final AlarmModel alarm;
 
   AlarmCard({required this.alarm});
 
@@ -26,7 +27,7 @@ class AlarmCard extends StatelessWidget {
       },
       onLongPress: () {
         // Show a confirmation dialog when the card is long-pressed
-        showDeleteConfirmationDialog(context,alarm);
+        showDeleteConfirmationDialog(context, alarm, alarm.id);
       },
       child: Container(
         margin: const EdgeInsets.all(6.0),
@@ -42,7 +43,7 @@ class AlarmCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          alarm.isAM
+                          alarm.isAm
                               ? Icons.wb_sunny_outlined
                               : Icons.dark_mode_outlined,
                         ),
@@ -50,13 +51,13 @@ class AlarmCard extends StatelessWidget {
                           width: 8,
                         ),
                         Text(
-                          alarm.hour.toString() + ":" + alarm.minute.toString(),
+                          alarm.ringTime,
                           style: Style.clockStyle(),
                         ),
                       ],
                     ),
                     Switch.adaptive(
-                      value: alarm.isSwitched,
+                      value: alarm.isEnabled,
                       onChanged: (value) {
                         print(
                             'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
@@ -69,7 +70,7 @@ class AlarmCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 4),
-                buildDaysRow(alarm.selectedDays),
+                // buildDaysRow(alarm.selectedDays!),
               ],
             ),
           ),
@@ -77,5 +78,4 @@ class AlarmCard extends StatelessWidget {
       ),
     );
   }
-
 }

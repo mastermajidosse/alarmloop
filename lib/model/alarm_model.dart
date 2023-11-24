@@ -7,6 +7,7 @@ class AlarmModel {
   String ringTime;
   String loopInterval;
   String title;
+  bool isAm;
 
   AlarmModel({
     required this.id,
@@ -15,6 +16,7 @@ class AlarmModel {
     this.ringTime = '--:--',
     this.loopInterval = '',
     this.title = 'alarm',
+    this.isAm = false,
   });
 
   Map<String, Object> toMap() => {
@@ -24,6 +26,7 @@ class AlarmModel {
         "ringTime": ringTime,
         "loopInterval": loopInterval,
         "title": title,
+        "isAm": isAm,
       };
 
   factory AlarmModel.fromMap(Map<String, dynamic> json) => AlarmModel(
@@ -33,9 +36,10 @@ class AlarmModel {
         ringTime: json["ringTime"] as String,
         loopInterval: json["loopInterval"] as String,
         title: json["title"] as String,
+        isAm: json["isAm"] as bool,
       );
 
-AlarmModel copyWith({String? label}) {
+AlarmModel copyWith({String? label,}) {
   return AlarmModel(
     id: this.id,
     sound: this.sound,
@@ -43,6 +47,7 @@ AlarmModel copyWith({String? label}) {
     ringTime: this.ringTime,
     loopInterval: this.loopInterval,
     title: label ?? this.title, // If label is not provided, use the existing title
+    isAm: this.isAm, // If label is not provided, use the existing title
   );
 }
 

@@ -1,13 +1,17 @@
+import 'package:just_audio/just_audio.dart';
+
 import '../../model/alarm.dart';
 
 class AlarmsStateUpdated {
-  final List<Alarm> alarms;
+  AlarmsStateUpdated({
+    required this.alarms,
+    this.isLoading = false,
+    required this.indexSelectedAlarm,
+  });
+  List<Alarm> alarms = [];
+  int indexSelectedAlarm =-1;
+  bool isLoading;
 
-  AlarmsStateUpdated(this.alarms);
 
-  AlarmsStateUpdated copyWith({List<Alarm>? alarms}) {
-    return AlarmsStateUpdated(
-      alarms ?? this.alarms,
-    );
-  }
+
 }

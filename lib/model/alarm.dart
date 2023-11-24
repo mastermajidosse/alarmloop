@@ -1,35 +1,35 @@
 class Alarm {
-  final int id; // Add a unique identifier
-  final String title;
-  final String selectedDays;
-  final bool isSwitched;
-  final bool isAM;
-  final int hour;
-  final int minute;
-  final String period;
+   int id; // Add a unique identifier
+   String title;
+   String selectedDays;
+   bool isSwitched;
+   bool isAM;
+   int hour;
+   int minute;
+   String period;
 
-  Alarm({
-    required this.id,
-    required this.title,
-    required this.selectedDays,
-    required this.isSwitched,
-    required this.isAM,
-    required this.hour,
-    required this.minute,
-    required this.period,
-  });
+  Alarm(
+    this.id,
+    this.title,
+    this.selectedDays,
+    this.isSwitched,
+    this.isAM,
+    this.hour,
+    this.minute,
+    this.period,
+  );
 
   // Factory method to create an Alarm instance from a JSON map
   factory Alarm.fromJson(Map<String, dynamic> json) {
     return Alarm(
-      id: json['id'], // Make sure to include 'id' in your JSON data
-      title: json['title'],
-      selectedDays: json['selectedDays'],
-      isSwitched: json['isSwitched'],
-      isAM: json['isAM'],
-      hour: json['hour'],
-      minute: json['minute'],
-      period: json['period'],
+       json['id'], // Make sure to include 'id' in your JSON data
+      json['title'],
+      json['selectedDays'],
+       json['isSwitched'],
+       json['isAM'],
+      json['hour'],
+       json['minute'],
+       json['period'],
     );
   }
 

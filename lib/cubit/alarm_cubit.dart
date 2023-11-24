@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:alarmloop/model/alarm_model.dart';
+import 'package:alarmloop/ui/edit/updated_edited_screen.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,57 @@ class AlarmCubit extends Cubit<AlarmState> {
     debugPrint('Init Preferences end');
     return true;
   }
+
+  Future<void> saveAlarms() async {
+    if (prefs == null) {
+      await initPrefs();
+    }
+
+    String json = jsonEncode(state.alarms.map((e) => e.toMap()).toList());
+    await prefs!.setString('alarms', json);
+
+    emit(AlarmState(
+      alarms: state.alarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
+
+  Future<void> loadAlarms() async {
+    if (prefs == null) {
+      await initPrefs();
+    }
+
+    String data = prefs!.getString('alarms') ?? '[]';
+
+    state.alarms = (json.decode(data) as List)
+        .map((alarm) => AlarmModel.fromMap(alarm))
+        .toList();
+
+    emit(AlarmState(
+      alarms: state.alarms,
+      indexSelectedAlarm: -1,
+    ));
+  }
+
+  void setIsSwitched() {
+    emit(state.copyWith(isSwitched: state.isSwitched));
+    print("AM::>${state.isSwitched}");
+  }
+
+  void setTimeOfDay(bool isAM) {
+    emit(state.copyWith(isAm: isAM));
+  }
+
+  setIsAm() {
+    if (state.indexSelectedAlarm == -1) {
+      return true;
+    }
+    return state.alarms[state.indexSelectedAlarm].isAm;
+  }
+  // void setAlarmTime(TimeOfDay alarmTime) {
+  //   emit(state.copyWith(alarmTime: alarmTime));
+  // }
 
   bool isTimerOn() {
     if (state.indexSelectedAlarm == -1) {
@@ -112,6 +164,89 @@ class AlarmCubit extends Cubit<AlarmState> {
     ));
   }
 
+  void turnOffSwitch(int id) async {
+    // deactivate the alarm
+    AndroidAlarmManager.cancel(id);
+    // show visual feedback to user
+    Fluttertoast.showToast(
+      msg: "The alarm has been deactivated",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.blue,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+    // update alarm model
+    state.alarms[state.indexSelectedAlarm].isAm = false;
+
+    emit(AlarmState(
+      alarms: state.alarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
+
+  void turnOnCheckBox(int id) {
+    state.alarms[state.indexSelectedAlarm].isEnabled = true;
+    emit(AlarmState(
+      alarms: state.alarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
+
+  void turnOffCheckBox(int id) {
+    state.alarms[state.indexSelectedAlarm].isEnabled = false;
+    emit(
+      AlarmState(
+        alarms: state.alarms,
+        loopIntervals: state.loopIntervals,
+        indexSelectedAlarm: state.indexSelectedAlarm,
+      ),
+    );
+  }
+
+  void turnOnSwitch(int id) async {
+    // deactivate the alarm
+    AndroidAlarmManager.cancel(id);
+    // show visual feedback to user
+    Fluttertoast.showToast(
+      msg: "The alarm has been deactivated",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.blue,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    // update alarm model
+    state.alarms[state.indexSelectedAlarm].isAm = true;
+
+    emit(AlarmState(
+      alarms: state.alarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
+
+  Future<void> deleteAlarm2(AlarmModel alarm) async {
+    List<AlarmModel> currentAlarms = state.alarms;
+    List<AlarmModel> updatedAlarms = List.from(currentAlarms)..remove(alarm);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> updatedAlarmStrings =
+        updatedAlarms.map((alarm) => jsonEncode(alarm.toMap())).toList();
+    await prefs.setStringList('alarms', updatedAlarmStrings);
+
+    emit(AlarmState(
+      alarms: updatedAlarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
+
   void deleteAlarm(BuildContext context, int id) async {
     if (prefs == null) {
       await initPrefs();
@@ -177,6 +312,10 @@ class AlarmCubit extends Cubit<AlarmState> {
         indexSelectedAlarm: state.indexSelectedAlarm,
       ));
     }
+  }
+
+  void setSwitch(bool isSwitched) {
+    emit(state.copyWith(isSwitched: isSwitched));
   }
 
   void saveAlarmLabel(String label) {
@@ -301,7 +440,8 @@ class AlarmCubit extends Cubit<AlarmState> {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
 
-    Navigator.pushNamed(context, EditScreen.routeName);
+    // Navigator.pushNamed(context, EditScreen.routeName);
+    Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
   }
 
   void saveAlarm(BuildContext context) async {
@@ -311,7 +451,6 @@ class AlarmCubit extends Cubit<AlarmState> {
 
     String json = jsonEncode(state.alarms.map((e) => e.toMap()).toList());
     await prefs!.setString('alarms', json);
-    
 
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
@@ -325,7 +464,8 @@ class AlarmCubit extends Cubit<AlarmState> {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
 
-    Navigator.pushNamed(context, EditScreen.routeName);
+    // Navigator.pushNamed(context, EditScreen.routeName);
+    Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
   }
 
   void cancelEditAlarm(BuildContext context) {

@@ -44,6 +44,8 @@ dependencies:
   flutter_local_notifications: ^9.7.0
   fluttertoast: ^8.0.9
   just_audio: ^0.9.36
+  timezone: ^0.8.0
+  awesome_notifications: any # Any attribute updates automatically your source to the last version
 
 
 
@@ -56,7 +58,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/app_icon.gif"
+  image_path: "assets/images/app_icon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
