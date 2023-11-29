@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'cubit/alarm_cubit.dart';
 import 'cubit/notification_cubit.dart';
+import 'cubit/set_alarm_time_cubit.dart';
 import 'cubit/sounds_cubut.dart';
 import 'ui/home/test_alarm.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -68,6 +69,9 @@ class MyApp extends StatelessWidget {
              
               BlocProvider<NotificationCubit>(
                 create: (BuildContext context) => NotificationCubit(),
+              ),
+              BlocProvider<SetAlarmTimeCubit>(
+                create: (BuildContext context) => SetAlarmTimeCubit(),
               ),
             ],
             child: MaterialApp(
