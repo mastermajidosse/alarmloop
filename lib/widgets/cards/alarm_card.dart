@@ -2,8 +2,6 @@ import 'package:alarmloop/model/alarm_model.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../alarm_cubit/alarm_updated_cubit.dart';
 import '../../core/core.dart';
 import '../../model/alarm.dart';
 import '../../ui/edit/updated_edited_screen.dart';

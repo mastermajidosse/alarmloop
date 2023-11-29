@@ -1,8 +1,6 @@
 import 'package:alarmloop/cubit/alarm_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../alarm_cubit/alarm_updated_cubit.dart';
 import '../ui/edit/updated_edited_screen.dart';
 import '../utils/style.dart';
 
@@ -86,7 +84,6 @@ Widget buildEmptyState(BuildContext context) {
         SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
-            // Handle the button press to add a new alarm
             Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
           },
           child: Text('Add Alarm'),

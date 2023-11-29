@@ -3,29 +3,131 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../alarm_cubit/alarm_edited_cubit.dart';
-import '../../alarm_cubit/alarm_edited_state.dart';
-import '../../alarm_cubit/alarm_updated_cubit.dart';
-import '../../alarm_cubit/update/update_alarm_cubit.dart';
-import '../../alarm_cubit/update/update_alarm_state.dart';
+import 'package:intl/intl.dart';
 import '../../cubit/alarm_cubit.dart';
 import '../../cubit/day_selection_cubit.dart';
 import '../../cubit/day_selection_state.dart';
-import '../../model/alarm.dart';
-import '../../model/args_model.dart';
+import '../../cubit/notification_cubit.dart';
+import '../../cubit/notification_state.dart';
+import '../../cubit/set_alarm_time_cubit.dart';
+import '../../cubit/set_alarm_time_state.dart';
 import '../../utils/style.dart';
 import '../../widgets/custom_card.dart';
 import '../choose_alarm/choose_alarm_screen.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tzdata;
 
 // ignore: must_be_immutable
-class UpdatedEditAlarmForm extends StatelessWidget {
+class UpdatedEditAlarmForm extends StatefulWidget {
   static String routeName = "/update-edited-screen";
-  
 
+  @override
+  State<UpdatedEditAlarmForm> createState() => _UpdatedEditAlarmFormState();
+}
 
+class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  late Stream<int> _countdownStream;
+
+  late DateTime _alarmTime;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _initializeNotifications();
+  //   _initializeTimeZone();
+  // }
+
+  // Future<void> _initializeTimeZone() async {
+  //   tzdata.initializeTimeZones();
+  //   final String timeZoneName = 'Africa/Casablanca'; // Morocco time zone
+  //   tz.setLocalLocation(tz.getLocation(timeZoneName));
+  // }
+
+  // Future<void> _initializeNotifications() async {
+  //   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  //   const AndroidInitializationSettings initializationSettingsAndroid =
+  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+  //   final InitializationSettings initializationSettings =
+  //       InitializationSettings(
+  //     android: initializationSettingsAndroid,
+  //   );
+  //   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  // }
+
+  Future<void> _scheduleAlarm(DateTime alarmTime) async {
+    // Set the alarm time
+    _alarmTime = alarmTime;
+
+    // Calculate the duration until the first alarm time
+    final durationUntilFirstAlarm = _alarmTime.difference(DateTime.now());
+
+    // Create a stream that emits a count of seconds until the first alarm time
+    _countdownStream = Stream.periodic(Duration(seconds: 1), (count) {
+      var remainingSeconds = durationUntilFirstAlarm.inSeconds - count;
+      return remainingSeconds > 0 ? remainingSeconds : 0;
+    }).take(durationUntilFirstAlarm.inSeconds);
+
+    // Schedule the first notification
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Alarm',
+      'Wake up! It\'s time!',
+      tz.TZDateTime.from(alarmTime, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'alarm_channel_id',
+          'Alarm Channel',
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+        ),
+      ),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+
+    // Schedule the additional notifications with a 10-minute interval
+    for (int i = 1; i <= 2; i++) {
+      final nextAlarmTime = _alarmTime.add(Duration(minutes: 10 * i));
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        i,
+        'Alarm',
+        'Wake up! It\'s time!',
+        tz.TZDateTime.from(nextAlarmTime, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'alarm_channel_id',
+            'Alarm Channel',
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+          ),
+        ),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    }
+    // Play the alarm sound when the alarm time arrives
+    // _countdownStream.listen((remainingSeconds) {
+    // if (remainingSeconds == 1) {
+    // final audioPlayer = AudioPlayer();
+    // final alarmSound =
+    //     'alarm_sound.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+
+    // audioPlayer.play(UrlSource(alarmSound));
+    // }
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final notificationCubit = BlocProvider.of<NotificationCubit>(context);
+
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
     return BlocProvider.value(
@@ -212,21 +314,45 @@ class UpdatedEditAlarmForm extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 32.0),
-                TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Style.whiteClr),
-                    textStyle: MaterialStateProperty.all(
-                      TextStyle(color: Style.blackClr),
+                BlocBuilder<SetAlarmTimeCubit, SetAlarmTimeState>(
+                  builder: (context, notificationState) => TextButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Style.whiteClr),
+                      textStyle: MaterialStateProperty.all(
+                        TextStyle(color: Style.blackClr),
+                      ),
+                      foregroundColor:
+                          MaterialStateProperty.all(Style.blackClr),
                     ),
-                    foregroundColor: MaterialStateProperty.all(Style.blackClr),
-                  ),
-                  onPressed: () {
-                    bloc.saveAlarm(context);
-                  },
-                  // onPressed: () => _saveAlarm(context),
-                  child: Text(
-                    'SET',
-                    style: Style.textStyleBtn(),
+                    onPressed: () async {
+                      if (notificationState is NotificationInitialState) {
+                        notificationCubit.initializeNotifications();
+                      }
+                      if (notificationState is TimeZoneInitialState) {
+                        notificationCubit.initializeTimeZone();
+                      }
+                      DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
+                      int hours = ringTime.hour;
+                      int minutes = ringTime.minute;
+
+                      final moroccoTimeZone =
+                          tz.getLocation('Africa/Casablanca');
+                      final now = tz.TZDateTime.now(moroccoTimeZone);
+                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
+                          now.month, now.day, hours, minutes);
+                      print("Local Time: ${alarmTime.toLocal()}");
+                      print("Local Time: $alarmTime");
+                      bloc.saveAlarm(context);
+                      if (alarm.isEnabled) {
+                        await _scheduleAlarm(alarmTime);
+                      }
+                    },
+                    // onPressed: () => _saveAlarm(context),
+                    child: Text(
+                      'SET',
+                      style: Style.textStyleBtn(),
+                    ),
                   ),
                 ),
               ],

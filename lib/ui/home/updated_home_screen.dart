@@ -1,11 +1,10 @@
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../alarm_cubit/update/update_alarm_cubit.dart';
 import '../../core/core.dart';
 import '../../core/notifier.dart';
 import '../../cubit/alarm_cubit.dart';
@@ -24,110 +23,7 @@ class UpdatedHomeScreen extends StatefulWidget {
 }
 
 class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
-  // late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  @override
-  void initState() {
-    // Only after at least the action method is set, the notification events are delivered
-    AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:
-            NotificationController.onNotificationCreatedMethod,
-        onNotificationDisplayedMethod:
-            NotificationController.onNotificationDisplayedMethod,
-        onDismissActionReceivedMethod:
-            NotificationController.onDismissActionReceivedMethod);
-
-    super.initState();
-  }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _initializeLocalNotifications();
-  // }
-
-  // Future<void> _initializeLocalNotifications() async {
-  //   var initializationSettingsAndroid =
-  //       new AndroidInitializationSettings('@mipmap/ic_launcher');
-  //   final InitializationSettings initializationSettings =
-  //       InitializationSettings(
-  //     android: initializationSettingsAndroid,
-  //   );
-
-  //   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  //   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-  //       onSelectNotification: _onSelectNotification);
-  // }
-
-  // Future<void> _onSelectNotification(String? payload) async {
-  //   // Handle notification click here
-  //   print("Notification Clicked! Payload: $payload");
-  //   // Add your logic to play sound or show a dialog here
-
-  //   // Example: Play a sound
-  //   final player = AudioPlayer();
-  //   player.play(UrlSource('assets/sounds/2.mp3'));
-  // }
-
-  // Future<void> scheduleAlarm(int id, String title, String body, int selectedDay,
-  //     int hour, int minute) async {
-  //   final AndroidNotificationDetails androidPlatformChannelSpecifics =
-  //       AndroidNotificationDetails(
-  //     'alarmId',
-  //     'alarmKeyChannel',
-  //     importance: Importance.max,
-  //     priority: Priority.high,
-  //     playSound: true,
-  //     sound: RawResourceAndroidNotificationSound('assets/sounds/2.mp3'),
-  //   );
-  //   final NotificationDetails platformChannelSpecifics =
-  //       NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  //   await flutterLocalNotificationsPlugin.zonedSchedule(
-  //     id,
-  //     title,
-  //     body,
-  //     _nextInstanceOfTime(selectedDay, hour, minute),
-  //     platformChannelSpecifics,
-  //     androidAllowWhileIdle: true,
-  //     uiLocalNotificationDateInterpretation:
-  //         UILocalNotificationDateInterpretation.absoluteTime,
-  //     payload: 'custom payload',
-  //   );
-
-  //   // Simulate the user selecting the notification immediately
-  //   await _onSelectNotification('custom payload');
-  // }
-
-  // tz.TZDateTime _nextInstanceOfTime(int selectedDay, int hour, int minute) {
-  //   // Get the current time in the user's local timezone
-  //   final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-
-  //   // Calculate the difference between the selected day and the current day
-  //   int daysUntilAlarm = (selectedDay - now.weekday + 7) % 7;
-
-  //   // Calculate the time of the next alarm occurrence
-  //   tz.TZDateTime scheduledDate = tz.TZDateTime(
-  //     tz.local,
-  //     now.year,
-  //     now.month,
-  //     now.day + daysUntilAlarm,
-  //     hour,
-  //     minute,
-  //   );
-
-  //   // If the calculated time is in the past or on the same day but the time has passed, move it to the next week
-  //   if (scheduledDate.isBefore(now) ||
-  //       (daysUntilAlarm == 0 &&
-  //           scheduledDate.isAtSameMomentAs(now) &&
-  //           scheduledDate.isBefore(now))) {
-  //     scheduledDate = scheduledDate.add(Duration(days: 7));
-  //   }
-  //   print("scheduledDate:::>$scheduledDate");
-  //   return scheduledDate;
-  // }
-
+  
   @override
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
@@ -151,19 +47,20 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
           elevation: 0,
           actions: [
             IconButton(
-                onPressed: () {
-                  AwesomeNotifications().createNotification(
-                      content: NotificationContent(
-                    badge: 1,
-                    id: 10,
-                    channelKey: 'basic_channel',
-                    actionType: ActionType.Default,
-                    title: 'Ringing Alarm',
-                    body: 'Time of ringing the alarm',
-                  ));
-                  // scheduleAlarm(1, 'title', 'body', 1, 9, 8);
-                },
-                icon: Icon(Icons.alarm_rounded, color: Style.blackClr))
+              onPressed: () {
+                // AwesomeNotifications().createNotification(
+                //     content: NotificationContent(
+                //   badge: 1,
+                //   id: 10,
+                //   channelKey: 'basic_channel',
+                //   actionType: ActionType.Default,
+                //   title: 'Ringing Alarm',
+                //   body: 'Time of ringing the alarm',
+                // ));
+                // scheduleAlarm(1, 'title', 'body', 1, 9, 8);
+              },
+              icon: Icon(Icons.alarm_rounded, color: Style.blackClr),
+            ),
           ],
         ),
         body: BlocBuilder<AlarmCubit, AlarmState>(

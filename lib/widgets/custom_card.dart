@@ -1,8 +1,6 @@
 import 'package:alarmloop/cubit/day_selection_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../alarm_cubit/alarm_updated_cubit.dart';
 import '../cubit/day_selection_cubit.dart';
 import '../utils/style.dart';
 
