@@ -46,6 +46,9 @@ dependencies:
   just_audio: ^0.9.36
   timezone: ^0.8.0
   intl: ^0.18.1
+  awesome_notifications_core: ^0.8.0 # <~ always ensure to use the latest version
+  awesome_notifications: any # <~ this version is managed by awesome_notifications_core package
+
 
 
 

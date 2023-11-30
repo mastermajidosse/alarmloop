@@ -1,4 +1,5 @@
 import 'package:alarmloop/model/alarm_model.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -83,6 +84,7 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
+          sound: RawResourceAndroidNotificationSound('raw/3'), // Use the soundId here
         ),
       ),
       androidAllowWhileIdle: true,
@@ -112,14 +114,13 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
     }
-    // Play the alarm sound when the alarm time arrives
     // _countdownStream.listen((remainingSeconds) {
     // if (remainingSeconds == 1) {
-    // final audioPlayer = AudioPlayer();
-    // final alarmSound =
-    //     'alarm_sound.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+    final audioPlayer = AudioPlayer();
+    final alarmSound =
+        'assets/sounds/alarm_sound.wav'; // Make sure 'alarm_sound.mp3' exists in your assets folder
 
-    // audioPlayer.play(UrlSource(alarmSound));
+    audioPlayer.play(UrlSource(alarmSound));
     // }
     // });
   }

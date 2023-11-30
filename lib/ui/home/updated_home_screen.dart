@@ -1,5 +1,8 @@
+import 'dart:isolate';
+
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 // import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +14,7 @@ import '../../cubit/alarm_cubit.dart';
 import '../../cubit/day_selection_cubit.dart';
 import '../../cubit/day_selection_state.dart';
 import '../../model/alarm_model.dart';
+import '../../widgets/button/bottom_add_bottom.dart';
 import '../../widgets/custom_card.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -23,7 +27,6 @@ class UpdatedHomeScreen extends StatefulWidget {
 }
 
 class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
-  
   @override
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
@@ -45,29 +48,12 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
           ),
           centerTitle: true,
           elevation: 0,
-          actions: [
-            IconButton(
-              onPressed: () {
-                // AwesomeNotifications().createNotification(
-                //     content: NotificationContent(
-                //   badge: 1,
-                //   id: 10,
-                //   channelKey: 'basic_channel',
-                //   actionType: ActionType.Default,
-                //   title: 'Ringing Alarm',
-                //   body: 'Time of ringing the alarm',
-                // ));
-                // scheduleAlarm(1, 'title', 'body', 1, 9, 8);
-              },
-              icon: Icon(Icons.alarm_rounded, color: Style.blackClr),
-            ),
-          ],
         ),
         body: BlocBuilder<AlarmCubit, AlarmState>(
           builder: (context, state) {
             return state.alarms.isEmpty
                 ? buildEmptyState(context)
-                : ListView.builder(
+                : ListView.separated(
                     itemCount: state.alarms.length,
                     itemBuilder: (context, index) {
                       AlarmModel alarm = state.alarms[index];
@@ -155,17 +141,22 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                         ),
                       );
                     },
+                    separatorBuilder: (context, index) => const Divider(),
                   );
           },
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Style.greyColor,
-          onPressed: () => bloc.addNewAlarm(context),
-          child: Icon(Icons.alarm_add),
+          onPressed: () {
+            bloc.addNewAlarm(context);
+            printHello();
+          },
+          child: Icon(Icons.add_circle),
         ),
       ),
     );
   }
+
 
   Widget buildDaysRow(String selectedDays) {
     List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];

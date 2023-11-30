@@ -1,4 +1,7 @@
+import 'dart:isolate';
+
 import 'package:alarmloop/cubit/alarm_cubit.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../ui/edit/updated_edited_screen.dart';
@@ -92,3 +95,18 @@ Widget buildEmptyState(BuildContext context) {
     ),
   );
 }
+  @pragma('vm:entry-point')
+  void printHello() {
+    final DateTime now = DateTime.now();
+    final int isolateId = Isolate.current.hashCode;
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: 10,
+            channelKey: 'basic_channel',
+            actionType: ActionType.Default,
+            title: 'Hello World!',
+            body: 'This is my first notification!',
+            summary: 'Summuary hh',
+            notificationLayout: NotificationLayout.Default));
+    print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
+  }
