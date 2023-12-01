@@ -1,6 +1,7 @@
 import 'package:alarmloop/model/alarm_model.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,15 +31,14 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  late Stream<int> _countdownStream;
-
-  late DateTime _alarmTime;
+  // late Stream<int> _countdownStream;
 
   // @override
   // void initState() {
   //   super.initState();
   //   _initializeNotifications();
   //   _initializeTimeZone();
+  //   loadSoundAsset();
   // }
 
   // Future<void> _initializeTimeZone() async {
@@ -58,77 +58,150 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
   //   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   // }
 
-  Future<void> _scheduleAlarm(DateTime alarmTime) async {
-    // Set the alarm time
-    _alarmTime = alarmTime;
+// Future<void> _scheduleAlarm(DateTime alarmTime) async {
+//   // Set the alarm time
+//   _alarmTime = alarmTime;
 
-    // Calculate the duration until the first alarm time
-    final durationUntilFirstAlarm = _alarmTime.difference(DateTime.now());
+//   // Calculate the duration until the first alarm time
+//   // final durationUntilFirstAlarm = _alarmTime.difference(DateTime.now());
 
-    // Create a stream that emits a count of seconds until the first alarm time
-    _countdownStream = Stream.periodic(Duration(seconds: 1), (count) {
-      var remainingSeconds = durationUntilFirstAlarm.inSeconds - count;
-      return remainingSeconds > 0 ? remainingSeconds : 0;
-    }).take(durationUntilFirstAlarm.inSeconds);
+//   // Create a stream that emits a count of seconds until the first alarm time
+//   // _countdownStream = Stream.periodic(Duration(seconds: 10), (count) {
+//   //   var remainingSeconds = durationUntilFirstAlarm.inSeconds - count;
+//   //   return remainingSeconds > 0 ? remainingSeconds : 0;
+//   // }).take(durationUntilFirstAlarm.inSeconds);
 
-    // Schedule the first notification
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Alarm',
-      'Wake up! It\'s time!',
-      tz.TZDateTime.from(alarmTime, tz.local),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'alarm_channel_id',
-          'Alarm Channel',
-          importance: Importance.high,
-          priority: Priority.high,
-          playSound: true,
-          sound: RawResourceAndroidNotificationSound('raw/3'), // Use the soundId here
-        ),
-      ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+//   // Schedule the first notification
+//   await flutterLocalNotificationsPlugin.zonedSchedule(
+//     0,
+//     'Alarm',
+//     'Wake up! It\'s time!',
+//     tz.TZDateTime.from(alarmTime, tz.local),
+//     NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         'alarm_channel_id',
+//         'Alarm Channel',
+//         importance: Importance.high,
+//         priority: Priority.high,
+//         color: Style.greyColor,
+//         playSound: true,
+//         sound: const UriAndroidNotificationSound("assets/sounds/3.mp3"),
+//         icon: 'launcher_icon',
+//       ),
+//     ),
+//     androidAllowWhileIdle: true,
+//     uiLocalNotificationDateInterpretation:
+//         UILocalNotificationDateInterpretation.absoluteTime,
+//   );
 
-    // Schedule the additional notifications with a 10-minute interval
-    for (int i = 1; i <= 2; i++) {
-      final nextAlarmTime = _alarmTime.add(Duration(minutes: 10 * i));
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        i,
-        'Alarm',
-        'Wake up! It\'s time!',
-        tz.TZDateTime.from(nextAlarmTime, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'alarm_channel_id',
-            'Alarm Channel',
-            importance: Importance.high,
-            priority: Priority.high,
-            playSound: true,
-          ),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-      );
-    }
-    // _countdownStream.listen((remainingSeconds) {
-    // if (remainingSeconds == 1) {
-    final audioPlayer = AudioPlayer();
-    final alarmSound =
-        'assets/sounds/alarm_sound.wav'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+//   // Schedule the additional notifications with a 10-minute interval
+//   for (int i = 1; i <= 2; i++) {
+//     final nextAlarmTime = _alarmTime.add(Duration(minutes: 10 * i));
+//     await flutterLocalNotificationsPlugin.zonedSchedule(
+//       i,
+//       'Alarm',
+//       'Wake up! It\'s time!',
+//       tz.TZDateTime.from(nextAlarmTime, tz.local),
+//       const NotificationDetails(
+//         android: AndroidNotificationDetails(
+//           'alarm_channel_id',
+//           'Alarm Channel',
+//           importance: Importance.high,
+//           priority: Priority.high,
+//           playSound: true,
+//           sound: const UriAndroidNotificationSound("assets/sounds/3.mp3"),
+//         ),
+//       ),
+//       androidAllowWhileIdle: true,
+//       uiLocalNotificationDateInterpretation:
+//           UILocalNotificationDateInterpretation.absoluteTime,
+//     );
+//   }
 
-    audioPlayer.play(UrlSource(alarmSound));
-    // }
-    // });
-  }
+  // Future<void> _scheduleAlarm(DateTime alarmTime) async {
+  //   // Set the alarm time
+  //   _alarmTime = alarmTime;
+
+  //   // Calculate the duration until the first alarm time
+  //   final durationUntilFirstAlarm = _alarmTime.difference(DateTime.now());
+
+  //   // Create a stream that emits a count of seconds until the first alarm time
+  //   _countdownStream = Stream.periodic(Duration(seconds: 10), (count) {
+  //     var remainingSeconds = durationUntilFirstAlarm.inSeconds - count;
+  //     return remainingSeconds > 0 ? remainingSeconds : 0;
+  //   }).take(durationUntilFirstAlarm.inSeconds);
+
+  //   // Schedule the first notification
+  //   await flutterLocalNotificationsPlugin.zonedSchedule(
+  //     0,
+  //     'Alarm',
+  //     'Wake up! It\'s time!',
+  //     tz.TZDateTime.from(alarmTime, tz.local),
+  //     NotificationDetails(
+  //       android: AndroidNotificationDetails(
+  //         'alarm_channel_id',
+  //         'Alarm Channel',
+  //         importance: Importance.high,
+  //         priority: Priority.high,
+  //         color: Style.greyColor,
+  //         // sound: RawResourceAndroidNotificationSound('alarm_sound'),
+  //         playSound: true,
+  //         sound: const UriAndroidNotificationSound("assets/sounds/3.mp3"),
+  //         icon: '@mipmap/launcher_icon',
+  //         largeIcon: DrawableResourceAndroidBitmap('@mipmap/launcher_icon'),
+  //       ),
+  //     ),
+  //     androidAllowWhileIdle: true,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.absoluteTime,
+  //   );
+
+  //   // Schedule the additional notifications with a 10-minute interval
+  //   for (int i = 1; i <= 2; i++) {
+  //     final nextAlarmTime = _alarmTime.add(Duration(minutes: 10 * i));
+  //     await flutterLocalNotificationsPlugin.zonedSchedule(
+  //       i,
+  //       'Alarm',
+  //       'Wake up! It\'s time!',
+  //       tz.TZDateTime.from(nextAlarmTime, tz.local),
+  //       const NotificationDetails(
+  //         android: AndroidNotificationDetails(
+  //           'alarm_channel_id',
+  //           'Alarm Channel',
+  //           importance: Importance.high,
+  //           priority: Priority.high,
+  //           playSound: true,
+  //         ),
+  //       ),
+  //       androidAllowWhileIdle: true,
+  //       uiLocalNotificationDateInterpretation:
+  //           UILocalNotificationDateInterpretation.absoluteTime,
+  //     );
+  //   }
+  // _countdownStream.listen((remainingSeconds) {
+  // if (remainingSeconds == 1) {
+  // final audioPlayer = AudioPlayer();
+  // final alarmSound =
+  //     'assets/sounds/alarm_sound.wav'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+
+  // audioPlayer.play(UrlSource(alarmSound));
+  // }
+  // });
+  // }
+
+  // Future<void> _scheduleAlarm(DateTime alarmTime) async {
+  //   _alarmTime = alarmTime;
+
+  // final durationUntilFirstAlarm = _alarmTime.difference(DateTime.now());
+
+  // _countdownStream = Stream.periodic(Duration(seconds: 10), (count) {
+  //   var remainingSeconds = durationUntilFirstAlarm.inSeconds - count;
+  //   return remainingSeconds > 0 ? remainingSeconds : 0;
+  // }).take(durationUntilFirstAlarm.inSeconds);
 
   @override
   Widget build(BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
-
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
     AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
     return BlocProvider.value(
@@ -315,6 +388,37 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                   ],
                 ),
                 SizedBox(height: 32.0),
+                // TextButton(
+                //   style: ButtonStyle(
+                //     backgroundColor: MaterialStateProperty.all(Style.whiteClr),
+                //     textStyle: MaterialStateProperty.all(
+                //       TextStyle(color: Style.blackClr),
+                //     ),
+                //     foregroundColor: MaterialStateProperty.all(Style.blackClr),
+                //   ),
+                //   onPressed: () async {
+                //     DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
+                //     int hours = ringTime.hour;
+                //     int minutes = ringTime.minute;
+
+                //     final moroccoTimeZone = tz.getLocation('Africa/Casablanca');
+                //     final now = tz.TZDateTime.now(moroccoTimeZone);
+                //     final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
+                //         now.month, now.day, hours, minutes);
+                //     print("Local Time: ${alarmTime.toLocal()}");
+                //     print("Local Time: $alarmTime");
+
+                //     bloc.saveAlarm(context);
+                //     if (alarm.isEnabled) {
+                //       await _scheduleAlarm(alarmTime);
+                //     }
+                //   },
+                //   // onPressed: () => _saveAlarm(context),
+                //   child: Text(
+                //     'SET',
+                //     style: Style.textStyleBtn(),
+                //   ),
+                // ),
                 BlocBuilder<SetAlarmTimeCubit, SetAlarmTimeState>(
                   builder: (context, notificationState) => TextButton(
                     style: ButtonStyle(
@@ -328,11 +432,15 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     ),
                     onPressed: () async {
                       if (notificationState is NotificationInitialState) {
-                        notificationCubit.initializeNotifications();
+                        await notificationCubit.initializeNotifications();
+                        print('Initialized notifications');
                       }
+
                       if (notificationState is TimeZoneInitialState) {
-                        notificationCubit.initializeTimeZone();
+                        await notificationCubit.initializeTimeZone();
+                        print('Initialized timezone');
                       }
+
                       DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
                       int hours = ringTime.hour;
                       int minutes = ringTime.minute;
@@ -340,15 +448,15 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                       final moroccoTimeZone =
                           tz.getLocation('Africa/Casablanca');
                       final now = tz.TZDateTime.now(moroccoTimeZone);
-                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
-                          now.month, now.day, hours, minutes);
+                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,now.month, now.day, hours, minutes);
                       print("Local Time: ${alarmTime.toLocal()}");
                       print("Local Time: $alarmTime");
                       bloc.saveAlarm(context);
                       if (alarm.isEnabled) {
-                        await _scheduleAlarm(alarmTime);
+                        await notificationCubit.scheduleAlarm(alarmTime);
                       }
                     },
+
                     // onPressed: () => _saveAlarm(context),
                     child: Text(
                       'SET',

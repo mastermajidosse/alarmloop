@@ -1,3 +1,5 @@
+import 'package:alarmloop/utils/style.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -9,7 +11,8 @@ class NotificationCubit extends Cubit<NotificationState> {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   bool _isInitialized = false;
-  bool _timezoneInitzed = false;
+  bool timezoneInit = false;
+  late DateTime _alarmTime;
 
   NotificationCubit()
       : flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin(),
@@ -28,10 +31,68 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
+  Future<void> scheduleAlarm(DateTime alarmTime) async {
+    _alarmTime = alarmTime;
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Alarm',
+      'TIME TIME TIME',
+      tz.TZDateTime.from(alarmTime, tz.local),
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'alarm_channel_id',
+          'Alarm Channel',
+          channelShowBadge: true, // Add this line
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+          sound: const UriAndroidNotificationSound("assets/sounds/alarm.wav"),
+          icon: 'launcher_icon',
+        ),
+      ),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: 'first_notification',
+    );
+
+    for (int i = 1; i <= 2; i++) {
+      // Calculate the time for additional notification
+      final additionalNotificationTime =
+          _alarmTime.subtract(Duration(minutes: 2 * i));
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        i,
+        'Alarm',
+        'Come on....',
+        tz.TZDateTime.from(additionalNotificationTime, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'alarm_channel_id',
+            'Alarm Channel',
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+          ),
+        ),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'additional_notification_$i',
+      );
+      AudioPlayer cache = new AudioPlayer();
+      //At the next line, DO NOT pass the entire reference such as assets/yes.mp3. This will not work.
+      //Just pass the file name only.
+      await cache.play(UrlSource("2.mp3"));
+    }
+  }
+
   Future<void> initializeTimeZone() async {
-    tzdata.initializeTimeZones();
-    _timezoneInitzed = true;
-    final String timeZoneName = 'Africa/Casablanca'; // Morocco time zone
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    if (!timezoneInit) {
+      tzdata.initializeTimeZones();
+      final String timeZoneName = 'Africa/Casablanca'; // Morocco time zone
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+      timezoneInit = true;
+    }
   }
 }

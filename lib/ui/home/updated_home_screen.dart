@@ -62,79 +62,97 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                         onTap: () async {
                           bloc.editAlarm(context, index);
                         },
-                        onLongPress: () {
-                          // Show a confirmation dialog when the card is long-pressed
-                          showDeleteConfirmationDialog(
-                              context, alarm, alarm.id);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(6.0),
+                        // onLongPress: () {
+                        //   // Show a confirmation dialog when the card is long-pressed
+                        //   showDeleteConfirmationDialog(
+                        //       context, alarm, alarm.id);
+                        // },
+                        child: Dismissible(
+                          key: Key(alarm.id.toString()),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            alignment: Alignment.centerRight,
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ), 
+                          confirmDismiss: (direction) async {
+                            await showDeleteConfirmationDialog(
+                                context, alarm, alarm.id);
+                          },
+                          onDismissed: (direction) {},
                           child: Container(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            alarm.isAm
-                                                ? Icons.wb_sunny_outlined
-                                                : Icons.dark_mode_outlined,
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Text(
-                                            alarm.ringTime,
-                                            style: Style.clockStyle(),
-                                          ),
-                                        ],
-                                      ),
-                                      Switch.adaptive(
-                                        value: alarm.isEnabled,
-                                        onChanged: (value) {
-                                          print(
-                                              'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
-                                        },
-                                        activeTrackColor: Style.blackClr,
-                                        activeColor: Style.greenClr,
-                                        inactiveThumbColor: Style.blackClr,
-                                        inactiveTrackColor: Style.greyColor,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 4),
-                                  BlocBuilder<DaySelectionCubit,
-                                      DaySelectionState>(
-                                    builder: (context, daySelectionState) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: List.generate(
-                                          7,
-                                          (index) => GestureDetector(
-                                            onTap: () {
-                                              context
-                                                  .read<DaySelectionCubit>()
-                                                  .toggleDay(index);
-                                            },
-                                            child: DayCard(
-                                              index: index,
-                                              dayIndex: index,
-                                              alarmIndex: index,
-                                              isHome: true,
+                            margin: const EdgeInsets.all(6.0),
+                            child: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              alarm.isAm
+                                                  ? Icons.wb_sunny_outlined
+                                                  : Icons.dark_mode_outlined,
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                              alarm.ringTime,
+                                              style: Style.clockStyle(),
+                                            ),
+                                          ],
+                                        ),
+                                        Switch.adaptive(
+                                          value: alarm.isEnabled,
+                                          onChanged: (value) {
+                                            print(
+                                                'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
+                                          },
+                                          activeTrackColor: Style.blackClr,
+                                          activeColor: Style.greenClr,
+                                          inactiveThumbColor: Style.blackClr,
+                                          inactiveTrackColor: Style.greyColor,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    BlocBuilder<DaySelectionCubit,
+                                        DaySelectionState>(
+                                      builder: (context, daySelectionState) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: List.generate(
+                                            7,
+                                            (index) => GestureDetector(
+                                              onTap: () {
+                                                context
+                                                    .read<DaySelectionCubit>()
+                                                    .toggleDay(index);
+                                              },
+                                              child: DayCard(
+                                                index: index,
+                                                dayIndex: index,
+                                                alarmIndex: index,
+                                                isHome: true,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -149,14 +167,13 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
           backgroundColor: Style.greyColor,
           onPressed: () {
             bloc.addNewAlarm(context);
-            printHello();
+            // printHello();
           },
           child: Icon(Icons.add_circle),
         ),
       ),
     );
   }
-
 
   Widget buildDaysRow(String selectedDays) {
     List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];

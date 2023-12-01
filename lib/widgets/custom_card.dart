@@ -49,8 +49,7 @@ class DayCard extends StatelessWidget {
             },
             child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
               builder: (context, state) {
-                final isSelected =
-                    context.read<DaySelectionCubit>().isSelected(dayIndex);
+                final isSelected = context.read<DaySelectionCubit>().isSelected(dayIndex);
 
                 return Center(
                   child: Text(

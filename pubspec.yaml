@@ -48,6 +48,8 @@ dependencies:
   intl: ^0.18.1
   awesome_notifications_core: ^0.8.0 # <~ always ensure to use the latest version
   awesome_notifications: any # <~ this version is managed by awesome_notifications_core package
+  device_info_plus: ^9.1.1
+  flutter_timezone: ^1.0.8
 
 
 

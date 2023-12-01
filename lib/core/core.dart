@@ -4,6 +4,7 @@ import 'package:alarmloop/cubit/alarm_cubit.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../ui/edit/updated_edited_screen.dart';
 import '../utils/style.dart';
 
@@ -42,8 +43,8 @@ Widget buildDaysRow(String selectedDays,index) {
   );
 }
 
-void showDeleteConfirmationDialog(BuildContext context, alarm, index) {
-  showDialog(
+Future<void> showDeleteConfirmationDialog(BuildContext context, alarm, index) async{
+  await showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -103,10 +104,10 @@ Widget buildEmptyState(BuildContext context) {
         content: NotificationContent(
             id: 10,
             channelKey: 'basic_channel',
-            actionType: ActionType.Default,
-            title: 'Hello World!',
-            body: 'This is my first notification!',
-            summary: 'Summuary hh',
+            actionType: ActionType.KeepOnTop,
+            title: 'TIME TIME.',
+            body: 'This is alarm at ${DateFormat.Hm(now)}',
+            summary: 'TIME COMES IN.',
             notificationLayout: NotificationLayout.Default));
-    print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
+    print("[${DateFormat.Hm(now)}] Hello, world! isolate=${isolateId} function='$printHello'");
   }

@@ -5,6 +5,7 @@ import 'package:alarmloop/ui/edit/updated_edited_screen.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +21,10 @@ class AlarmCubit extends Cubit<AlarmState> {
           alarms: [],
           indexSelectedAlarm: -1,
         ));
+ 
 
+
+ 
   SharedPreferences? prefs;
 
   Future<bool> initPrefs() async {
@@ -44,7 +48,12 @@ class AlarmCubit extends Cubit<AlarmState> {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
   }
-
+  
+  void loadSoundAsset() async {
+    final ByteData data = await rootBundle.load('assets/sounds/alarm.wav');
+    final List<int> bytes = data.buffer.asUint8List();
+    print('Loaded ${bytes.length} bytes from assets/sounds/alarm.wav');
+  }
   Future<void> loadAlarms() async {
     if (prefs == null) {
       await initPrefs();
@@ -164,29 +173,7 @@ class AlarmCubit extends Cubit<AlarmState> {
     ));
   }
 
-  void turnOffSwitch(int id) async {
-    // deactivate the alarm
-    AndroidAlarmManager.cancel(id);
-    // show visual feedback to user
-    Fluttertoast.showToast(
-      msg: "The alarm has been deactivated",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.blue,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-
-    // update alarm model
-    state.alarms[state.indexSelectedAlarm].isAm = false;
-
-    emit(AlarmState(
-      alarms: state.alarms,
-      loopIntervals: state.loopIntervals,
-      indexSelectedAlarm: state.indexSelectedAlarm,
-    ));
-  }
+  
 
   void turnOnCheckBox(int id) {
     state.alarms[state.indexSelectedAlarm].isEnabled = true;
@@ -207,13 +194,35 @@ class AlarmCubit extends Cubit<AlarmState> {
       ),
     );
   }
+void turnOffSwitch(int id) async {
+    // deactivate the alarm
+    AndroidAlarmManager.cancel(id);
+    // show visual feedback to user
+    Fluttertoast.showToast(
+      msg: "Switched to PM",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.blue,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
 
+    // update alarm model
+    state.alarms[state.indexSelectedAlarm].isAm = false;
+
+    emit(AlarmState(
+      alarms: state.alarms,
+      loopIntervals: state.loopIntervals,
+      indexSelectedAlarm: state.indexSelectedAlarm,
+    ));
+  }
   void turnOnSwitch(int id) async {
     // deactivate the alarm
     AndroidAlarmManager.cancel(id);
     // show visual feedback to user
     Fluttertoast.showToast(
-      msg: "The alarm has been deactivated",
+      msg: "Switched to AM",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
