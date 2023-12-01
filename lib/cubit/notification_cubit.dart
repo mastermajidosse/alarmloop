@@ -1,3 +1,4 @@
+import 'package:alarmloop/core/constant.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
@@ -46,7 +47,8 @@ class NotificationCubit extends Cubit<NotificationState> {
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
-          sound: const UriAndroidNotificationSound("assets/sounds/alarm.wav"),
+          channelDescription: 'TRYING TO PUSH UU',
+           sound: RawResourceAndroidNotificationSound('alarm_sound'),
           icon: 'launcher_icon',
         ),
       ),
@@ -80,10 +82,7 @@ class NotificationCubit extends Cubit<NotificationState> {
             UILocalNotificationDateInterpretation.absoluteTime,
         payload: 'additional_notification_$i',
       );
-      AudioPlayer cache = new AudioPlayer();
-      //At the next line, DO NOT pass the entire reference such as assets/yes.mp3. This will not work.
-      //Just pass the file name only.
-      await cache.play(UrlSource("2.mp3"));
+     AudioService().playSound(Constants.sound );
     }
   }
 
@@ -96,3 +95,19 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 }
+
+
+class AudioService {
+    
+      AudioService._();
+    
+      static final AudioService _instance = AudioService._();
+    
+      factory AudioService() {
+        return _instance;
+      }
+    
+      void playSound(AssetSource assetSource) async{
+          AudioPlayer().play(assetSource, mode: PlayerMode.lowLatency); // faster play low latency eg for a game...
+      }
+    }
