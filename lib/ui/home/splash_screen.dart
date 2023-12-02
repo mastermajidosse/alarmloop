@@ -1,4 +1,5 @@
 import 'package:alarmloop/ui/home/updated_home_screen.dart';
+import 'package:alarmloop/utils/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,14 +26,13 @@ class SplashScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/images/app_icon.gif',
-                  fit: BoxFit.cover,
-                  width: 60,
-                  height: 60,
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage('assets/images/app_icon.gif'),
                 ),
+                SizedBox(height: 8),
                 CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  valueColor: AlwaysStoppedAnimation<Color>(Style.greyColor),
                 ),
               ],
             ),

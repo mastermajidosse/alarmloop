@@ -13,6 +13,7 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   bool _isInitialized = false;
   bool timezoneInit = false;
+  AudioPlayer audioPlayer = AudioPlayer();
   late DateTime _alarmTime;
 
   NotificationCubit()
@@ -22,7 +23,7 @@ class NotificationCubit extends Cubit<NotificationState> {
   Future<void> initializeNotifications() async {
     if (!_isInitialized) {
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('@mipmap/launcher_icon');
       final InitializationSettings initializationSettings =
           InitializationSettings(
         android: initializationSettingsAndroid,
@@ -32,58 +33,61 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> scheduleAlarm(DateTime alarmTime) async {
+  Future<void> scheduleAlarm(DateTime alarmTime, sound) async {
     _alarmTime = alarmTime;
+
+    // Schedule the first notification
+    await scheduleNotification(0, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
+
+    // Schedule additional notifications with a 10-minute interval
+    for (int i = 1; i <= 2; i++) {
+      final additionalNotificationTime =
+          _alarmTime.add(Duration(minutes: 10 * i));
+
+      await scheduleNotification(
+          i, 'it\'s Time ⏰', 'Ringing ⏰', additionalNotificationTime, sound);
+
+      String audioPath = 'assets/sounds/${sound}.mp3';
+      print("audioPath $audioPath");
+      await playMusic(sound);
+    }
+  }
+
+  Future<void> playMusic(String audioPath) async {
+    // await audioPlayer.setSourceUrl(audioPath);
+    await audioPlayer.play(UrlSource(audioPath));
+  }
+
+  Future<void> scheduleNotification(
+    int id,
+    String title,
+    String body,
+    DateTime scheduledTime,
+    sound,
+  ) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Alarm',
-      'TIME TIME TIME',
-      tz.TZDateTime.from(alarmTime, tz.local),
+      id,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledTime, tz.local),
       NotificationDetails(
         android: AndroidNotificationDetails(
-          'alarm_channel_id',
-          'Alarm Channel',
-          channelShowBadge: true, // Add this line
+          '1',
+          'new channel',
+          channelShowBadge: true,
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
-          channelDescription: 'TRYING TO PUSH UU',
-           sound: RawResourceAndroidNotificationSound('alarm_sound'),
+          // channelDescription: 'TRYING TO PUSH UU',
+          sound: RawResourceAndroidNotificationSound(sound),
           icon: 'launcher_icon',
         ),
       ),
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      payload: 'first_notification',
+      payload: 'notification_$id',
     );
-
-    for (int i = 1; i <= 2; i++) {
-      // Calculate the time for additional notification
-      final additionalNotificationTime =
-          _alarmTime.subtract(Duration(minutes: 2 * i));
-
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        i,
-        'Alarm',
-        'Come on....',
-        tz.TZDateTime.from(additionalNotificationTime, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'alarm_channel_id',
-            'Alarm Channel',
-            importance: Importance.high,
-            priority: Priority.high,
-            playSound: true,
-          ),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        payload: 'additional_notification_$i',
-      );
-     AudioService().playSound(Constants.sound );
-    }
   }
 
   Future<void> initializeTimeZone() async {
@@ -96,18 +100,16 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 }
 
-
 class AudioService {
-    
-      AudioService._();
-    
-      static final AudioService _instance = AudioService._();
-    
-      factory AudioService() {
-        return _instance;
-      }
-    
-      void playSound(AssetSource assetSource) async{
-          AudioPlayer().play(assetSource, mode: PlayerMode.lowLatency); // faster play low latency eg for a game...
-      }
-    }
+  AudioService._();
+
+  static final AudioService _instance = AudioService._();
+
+  factory AudioService() {
+    return _instance;
+  }
+
+  void playSound(AssetSource assetSource) async {
+    AudioPlayer().play(assetSource, mode: PlayerMode.lowLatency);
+  }
+}

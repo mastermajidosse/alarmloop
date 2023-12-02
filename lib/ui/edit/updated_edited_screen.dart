@@ -453,7 +453,7 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                       print("Local Time: $alarmTime");
                       bloc.saveAlarm(context);
                       if (alarm.isEnabled) {
-                        await notificationCubit.scheduleAlarm(alarmTime);
+                        await notificationCubit.scheduleAlarm(alarmTime,'forth');
                       }
                     },
 

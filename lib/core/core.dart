@@ -88,7 +88,7 @@ Widget buildEmptyState(BuildContext context) {
         SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
-            Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
+             BlocProvider.of<AlarmCubit>(context).addNewAlarm(context);
           },
           child: Text('Add Alarm'),
         ),

@@ -59,7 +59,6 @@ class ChooseAlarmScreen extends StatelessWidget {
                       itemCount: sounds.length,
                       itemBuilder: (BuildContext context, int index) {
                         SoundModel sound = sounds[index];
-
                         return GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
