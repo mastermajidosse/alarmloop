@@ -435,7 +435,7 @@ void turnOffSwitch(int id) async {
     ));
   }
 
-  void addNewAlarm(BuildContext context) {
+  void addNewAlarm(BuildContext context) async{
     state.indexSelectedAlarm = state.alarms.length;
     state.alarms.add(
       AlarmModel(
@@ -449,19 +449,16 @@ void turnOffSwitch(int id) async {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
 
-    // Navigator.pushNamed(context, EditScreen.routeName);
     Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
+    
   }
 
   void saveAlarm(BuildContext context) async {
     if (prefs == null) {
       await initPrefs();
     }
-
     String json = jsonEncode(state.alarms.map((e) => e.toMap()).toList());
     await prefs!.setString('alarms', json);
-
-    // ignore: use_build_context_synchronously
     Navigator.pop(context);
   }
 
@@ -472,7 +469,6 @@ void turnOffSwitch(int id) async {
       alarms: state.alarms,
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
-
     // Navigator.pushNamed(context, EditScreen.routeName);
     Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
   }

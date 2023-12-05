@@ -3,17 +3,21 @@ import 'package:bloc/bloc.dart';
 
 enum DaySelectionEvent { toggleDay }
 
+
+
 class DaySelectionCubit extends Cubit<DaySelectionState> {
-  DaySelectionCubit()
-      : super(DaySelectionState(List.generate(7, (index) => false)));
+  static List<bool> _selectedDays = List.generate(7, (index) => false);
+
+  DaySelectionCubit() : super(DaySelectionState(_selectedDays));
 
   void toggleDay(int index) {
-    final List<bool> updatedSelection = List.from(state.selectedDays);
+    final List<bool> updatedSelection = List.from(_selectedDays);
     updatedSelection[index] = !updatedSelection[index];
+    _selectedDays = updatedSelection;
     emit(DaySelectionState(updatedSelection));
   }
 
   bool isSelected(int index) {
-    return state.selectedDays[index];
+    return _selectedDays[index];
   }
 }

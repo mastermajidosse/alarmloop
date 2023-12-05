@@ -17,11 +17,12 @@ import '../../utils/style.dart';
 import '../../widgets/custom_card.dart';
 import '../choose_alarm/choose_alarm_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tzdata;
 
 // ignore: must_be_immutable
 class UpdatedEditAlarmForm extends StatefulWidget {
+  final int alarmIndex;
   static String routeName = "/update-edited-screen";
+  UpdatedEditAlarmForm({this.alarmIndex=0});
 
   @override
   State<UpdatedEditAlarmForm> createState() => _UpdatedEditAlarmFormState();
@@ -318,21 +319,27 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                 ),
                 // Dynamic days selection
                 BlocBuilder<DaySelectionCubit, DaySelectionState>(
-                  builder: (context, state) {
+                  builder: (context, daySelectionState) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: List.generate(
                         7,
-                        (index) => DayCard(
-                          isHome: false,
-                          dayIndex: index,
-                          alarmIndex: alarm.id,
-                          index: index,
+                        (alarmIndx) => GestureDetector(
+                          onTap: () {
+                            context
+                                .read<DaySelectionCubit>()
+                                .toggleDay(widget.alarmIndex);
+                          },
+                          child: DayCard(
+                            dayIndex: alarmIndx,
+                            alarmIndex:widget.alarmIndex!, // Pass the alarmIndex to each DayCard
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
+
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.h),
                   child: const Divider(),
@@ -435,12 +442,10 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                         await notificationCubit.initializeNotifications();
                         print('Initialized notifications');
                       }
-
                       if (notificationState is TimeZoneInitialState) {
                         await notificationCubit.initializeTimeZone();
                         print('Initialized timezone');
                       }
-
                       DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
                       int hours = ringTime.hour;
                       int minutes = ringTime.minute;
@@ -448,15 +453,15 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                       final moroccoTimeZone =
                           tz.getLocation('Africa/Casablanca');
                       final now = tz.TZDateTime.now(moroccoTimeZone);
-                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,now.month, now.day, hours, minutes);
+                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
+                          now.month, now.day, hours, minutes);
                       print("Local Time: ${alarmTime.toLocal()}");
                       print("Local Time: $alarmTime");
                       bloc.saveAlarm(context);
                       if (alarm.isEnabled) {
-                        await notificationCubit.scheduleAlarm(alarmTime,'forth');
+                        await notificationCubit.scheduleAlarm(alarmTime,alarm.sound.sound.split('.')[0], alarm.id);
                       }
                     },
-
                     // onPressed: () => _saveAlarm(context),
                     child: Text(
                       'SET',

@@ -19,7 +19,7 @@ class AlarmCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UpdatedEditAlarmForm(),
+            builder: (context) => UpdatedEditAlarmForm(alarmIndex: alarm.id,),
           ),
         );
       },

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 class DaySelectionState extends Equatable {
   final List<bool> selectedDays;
 

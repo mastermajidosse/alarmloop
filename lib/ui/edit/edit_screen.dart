@@ -58,7 +58,7 @@ class EditScreen extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  bloc.saveAlarm(context);
+                  // bloc.saveAlarm(context);
                   bloc.saveAlarmLabel(alarm.title);
                 },
                 color: Colors.red,

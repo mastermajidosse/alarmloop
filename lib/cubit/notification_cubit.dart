@@ -33,11 +33,11 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> scheduleAlarm(DateTime alarmTime, sound) async {
+  Future<void> scheduleAlarm(DateTime alarmTime, sound,index) async {
     _alarmTime = alarmTime;
 
     // Schedule the first notification
-    await scheduleNotification(0, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
+    await scheduleNotification(index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
 
     // Schedule additional notifications with a 10-minute interval
     for (int i = 1; i <= 2; i++) {
@@ -72,7 +72,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       tz.TZDateTime.from(scheduledTime, tz.local),
       NotificationDetails(
         android: AndroidNotificationDetails(
-          '1',
+          id.toString(),
           'new channel',
           channelShowBadge: true,
           importance: Importance.high,
@@ -100,16 +100,3 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 }
 
-class AudioService {
-  AudioService._();
-
-  static final AudioService _instance = AudioService._();
-
-  factory AudioService() {
-    return _instance;
-  }
-
-  void playSound(AssetSource assetSource) async {
-    AudioPlayer().play(assetSource, mode: PlayerMode.lowLatency);
-  }
-}

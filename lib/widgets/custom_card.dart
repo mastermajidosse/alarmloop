@@ -5,65 +5,37 @@ import '../cubit/day_selection_cubit.dart';
 import '../utils/style.dart';
 
 class DayCard extends StatelessWidget {
-  final int index;
-  final bool isHome;
   final int dayIndex;
   final int alarmIndex;
 
   const DayCard({
-    required this.isHome,
-    required this.index,
     required this.dayIndex,
     required this.alarmIndex,
   });
 
   @override
   Widget build(BuildContext context) {
-    return isHome
-        ? GestureDetector(
-            onTap: () {
-              // Dispatch the toggleDay event when the card is tapped
-              context.read<DaySelectionCubit>().toggleDay(dayIndex);
-            },
-            child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
-              builder: (context, state) {
-                final isSelected =
-                    context.read<DaySelectionCubit>().isSelected(dayIndex);
-
-                return Center(
-                  child: Text(
-                    getDayAbbreviation(dayIndex),
-                    style: TextStyle(
-                      color: isSelected ? Style.greyColor : Style.blackClr,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        : GestureDetector(
-            onTap: () {
-              // Dispatch the toggleDay event when the card is tapped
-              context.read<DaySelectionCubit>().toggleDay(dayIndex);
-            },
-            child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
-              builder: (context, state) {
-                final isSelected = context.read<DaySelectionCubit>().isSelected(dayIndex);
-
-                return Center(
-                  child: Text(
-                    getDayAbbreviation(dayIndex),
-                    style: TextStyle(
-                      color: isSelected ? Style.greyColor : Style.blackClr,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              },
+    return GestureDetector(
+      onTap: () {
+        context.read<DaySelectionCubit>().toggleDay(alarmIndex);
+      },
+      child: BlocBuilder<DaySelectionCubit, DaySelectionState>(
+        builder: (context, state) {
+          final isSelected = context.read<DaySelectionCubit>().isSelected(alarmIndex);
+          return Center(
+            child: Text(
+              getDayAbbreviation(dayIndex),
+              style: TextStyle(
+                color: isSelected ? Style.greyColor : Style.blackClr,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           );
+        },
+      ),
+    );
   }
+
 
   String getDayAbbreviation(int index) {
     // Adjust the index to start from Monday
@@ -87,4 +59,7 @@ class DayCard extends StatelessWidget {
         return '';
     }
   }
+
+
+
 }

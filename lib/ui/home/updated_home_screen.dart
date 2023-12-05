@@ -78,7 +78,7 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                               Icons.delete,
                               color: Colors.white,
                             ),
-                          ), 
+                          ),
                           confirmDismiss: (direction) async {
                             await showDeleteConfirmationDialog(
                                 context, alarm, alarm.id);
@@ -126,29 +126,9 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                       ],
                                     ),
                                     SizedBox(height: 4),
-                                    BlocBuilder<DaySelectionCubit,
-                                        DaySelectionState>(
-                                      builder: (context, daySelectionState) {
-                                        return Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: List.generate(
-                                            7,
-                                            (index) => GestureDetector(
-                                              onTap: () {
-                                                context
-                                                    .read<DaySelectionCubit>()
-                                                    .toggleDay(index);
-                                              },
-                                              child: DayCard(
-                                                index: index,
-                                                dayIndex: index,
-                                                alarmIndex: index,
-                                                isHome: true,
-                                              ),
-                                            ),
-                                          ),
-                                        );
+                                    BlocBuilder<DaySelectionCubit, DaySelectionState>(
+                                      builder: (context, stat) {
+                                        return  DayCard(dayIndex:index,alarmIndex:index,);
                                       },
                                     ),
                                   ],
