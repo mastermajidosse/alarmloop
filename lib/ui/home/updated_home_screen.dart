@@ -11,8 +11,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/core.dart';
 import '../../core/notifier.dart';
 import '../../cubit/alarm_cubit.dart';
-import '../../cubit/day_selection_cubit.dart';
-import '../../cubit/day_selection_state.dart';
 import '../../model/alarm_model.dart';
 import '../../widgets/button/bottom_add_bottom.dart';
 import '../../widgets/custom_card.dart';
@@ -115,8 +113,7 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                         Switch.adaptive(
                                           value: alarm.isEnabled,
                                           onChanged: (value) {
-                                            print(
-                                                'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
+                                            print('Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
                                           },
                                           activeTrackColor: Style.blackClr,
                                           activeColor: Style.greenClr,
@@ -126,11 +123,6 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                       ],
                                     ),
                                     SizedBox(height: 4),
-                                    BlocBuilder<DaySelectionCubit, DaySelectionState>(
-                                      builder: (context, stat) {
-                                        return  DayCard(dayIndex:index,alarmIndex:index,);
-                                      },
-                                    ),
                                   ],
                                 ),
                               ),
@@ -155,22 +147,5 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
     );
   }
 
-  Widget buildDaysRow(String selectedDays) {
-    List<String> allDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return Row(
-      children: allDays.map((day) {
-        bool isSelected = selectedDays.contains(day);
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 6.0),
-          margin: EdgeInsets.only(right: 4.0),
-          child: Text(
-            day,
-            style: isSelected
-                ? Style.isSelectedDayStyle()
-                : Style.isNotSelectedDayStyle(),
-          ),
-        );
-      }).toList(),
-    );
-  }
+
 }

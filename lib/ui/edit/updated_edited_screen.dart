@@ -1,20 +1,17 @@
 import 'package:alarmloop/model/alarm_model.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import '../../core/core.dart';
 import '../../cubit/alarm_cubit.dart';
-import '../../cubit/day_selection_cubit.dart';
-import '../../cubit/day_selection_state.dart';
 import '../../cubit/notification_cubit.dart';
 import '../../cubit/notification_state.dart';
 import '../../cubit/set_alarm_time_cubit.dart';
 import '../../cubit/set_alarm_time_state.dart';
 import '../../utils/style.dart';
-import '../../widgets/custom_card.dart';
+import '../../widgets/button/my_chip.dart';
 import '../choose_alarm/choose_alarm_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -22,7 +19,7 @@ import 'package:timezone/timezone.dart' as tz;
 class UpdatedEditAlarmForm extends StatefulWidget {
   final int alarmIndex;
   static String routeName = "/update-edited-screen";
-  UpdatedEditAlarmForm({this.alarmIndex=0});
+  UpdatedEditAlarmForm({this.alarmIndex = 0});
 
   @override
   State<UpdatedEditAlarmForm> createState() => _UpdatedEditAlarmFormState();
@@ -204,7 +201,20 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
   Widget build(BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
-    AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
+    int selectedAlarmIndex = bloc.state.indexSelectedAlarm ?? 0;
+
+    AlarmModel alarm = bloc.state.alarms[selectedAlarmIndex];
+    // AlarmModel alarm = bloc.state.alarms[bloc.state.indexSelectedAlarm];
+
+    // Initial Selected Value
+    String dropdownvalue = 'min';
+
+    // List of items in our dropdown menu
+    var items = [
+      'min',
+      'h',
+    ];
+    TextEditingController loopIntervalController = TextEditingController();
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context),
       child: Scaffold(
@@ -317,29 +327,121 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                   padding: EdgeInsets.symmetric(vertical: 10.h),
                   child: const Divider(),
                 ),
-                // Dynamic days selection
-                BlocBuilder<DaySelectionCubit, DaySelectionState>(
-                  builder: (context, daySelectionState) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(
-                        7,
-                        (alarmIndx) => GestureDetector(
-                          onTap: () {
-                            context
-                                .read<DaySelectionCubit>()
-                                .toggleDay(widget.alarmIndex);
-                          },
-                          child: DayCard(
-                            dayIndex: alarmIndx,
-                            alarmIndex:widget.alarmIndex!, // Pass the alarmIndex to each DayCard
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(
+                      Icons.loop_rounded,
+                      color: Colors.red,
+                    ),
+                    BlocBuilder<AlarmCubit, AlarmState>(
+                        builder: (context, state) {
+                      bloc.getLoopIntervals();
+                      List<String> loopIntervals = state.loopIntervals;
 
+                      return Wrap(
+                        children: [
+                          ...List.generate(
+                            loopIntervals.length,
+                            (int index) {
+                              bool isSelected =
+                                  alarm.loopInterval == loopIntervals[index];
+
+                              return MyChip(
+                                text: loopIntervals[index],
+                                backgroundColor: isSelected
+                                    ? Colors.blue
+                                    : Colors.grey.shade200,
+                                textColor:
+                                    isSelected ? Colors.white : Colors.black,
+                                onTap: () {
+                                  bloc.setselectedLoopInterval(
+                                      loopIntervals[index]);
+                                },
+                              );
+                            },
+                            growable: true,
+                          ),
+                          MyChip(
+                            text: '+',
+                            backgroundColor: Colors.grey.shade200,
+                            textColor: Colors.black,
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                barrierLabel: 'Add loop interval',
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Add loop interval'),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("Cancel"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: const Text("Add"),
+                                        onPressed: () {
+                                          bloc.addLoopInterval(
+                                            context,
+                                            "${loopIntervalController.text} $dropdownvalue",
+                                            alarm.id.toString(),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                    content: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 100.w,
+                                          child: TextField(
+                                            controller: loopIntervalController,
+                                            keyboardType: TextInputType.number,
+                                            autofocus: true,
+                                            decoration: const InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(10),
+                                                  ),
+                                                ),
+                                                hintText: 'Value'),
+                                          ),
+                                        ),
+                                        SizedBox(width: 20.w),
+                                        StatefulBuilder(
+                                            builder: (context, setState) {
+                                          return DropdownButton(
+                                            value: dropdownvalue,
+                                            icon: const Icon(
+                                                Icons.keyboard_arrow_down),
+                                            items: items.map((String items) {
+                                              return DropdownMenuItem(
+                                                value: items,
+                                                child: Text(items),
+                                              );
+                                            }).toList(),
+                                            onChanged: (String? newValue) {
+                                              dropdownvalue = newValue!;
+                                              setState(() {});
+                                            },
+                                          );
+                                        }),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.h),
                   child: const Divider(),
@@ -377,7 +479,7 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                             if (value == true) {
                               bloc.turnOnCheckBox(alarm.id);
                             } else {
-                              bloc.turnOffCheckBox(alarm.id);
+                              bloc.turnOffCheckBox(alarm.id, context);
                             }
                             print("isEnabled$value");
                           },
@@ -450,16 +552,19 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                       int hours = ringTime.hour;
                       int minutes = ringTime.minute;
 
-                      final moroccoTimeZone =
-                          tz.getLocation('Africa/Casablanca');
+                      final moroccoTimeZone = tz.getLocation('Africa/Casablanca');
                       final now = tz.TZDateTime.now(moroccoTimeZone);
-                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
-                          now.month, now.day, hours, minutes);
+                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,now.month, now.day, hours, minutes);
                       print("Local Time: ${alarmTime.toLocal()}");
                       print("Local Time: $alarmTime");
                       bloc.saveAlarm(context);
                       if (alarm.isEnabled) {
-                        await notificationCubit.scheduleAlarm(alarmTime,alarm.sound.sound.split('.')[0], alarm.id);
+                        await notificationCubit.scheduleAlarm(
+                          alarmTime,
+                          alarm.sound.sound.split('.')[0],
+                          alarm.id,
+                          extractLoopInterval(alarm.loopInterval),
+                        );
                       }
                     },
                     // onPressed: () => _saveAlarm(context),

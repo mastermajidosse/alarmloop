@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alarmloop/core/constant.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -33,25 +35,61 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> scheduleAlarm(DateTime alarmTime, sound,index) async {
-    _alarmTime = alarmTime;
-
+  Future<void> scheduleAlarm(
+      DateTime alarmTime, String sound, int index, int loopInterval) async {
     // Schedule the first notification
-    await scheduleNotification(index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
+    await scheduleNotification(
+        index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
 
-    // Schedule additional notifications with a 10-minute interval
-    for (int i = 1; i <= 2; i++) {
+    Timer? periodicTimer;
+
+    // Schedule additional notifications with the specified interval
+    periodicTimer =
+        Timer.periodic(Duration(minutes: loopInterval), (timer) async {
       final additionalNotificationTime =
-          _alarmTime.add(Duration(minutes: 10 * i));
-
+          DateTime.now().add(Duration(minutes: loopInterval));
       await scheduleNotification(
-          i, 'it\'s Time ⏰', 'Ringing ⏰', additionalNotificationTime, sound);
+        timer.tick, // Use tick as an index for additional notifications
+        'it\'s Time ⏰',
+        'Ringing ⏰',
+        additionalNotificationTime,
+        sound,
+      );
 
-      String audioPath = 'assets/sounds/${sound}.mp3';
+      String audioPath = 'assets/sounds/$sound.mp3';
       print("audioPath $audioPath");
       await playMusic(sound);
-    }
+
+      // You can add a condition to cancel the timer if needed
+      if (userCancelledNotification()) {
+        periodicTimer?.cancel();
+      }
+    });
   }
+
+  bool userCancelledNotification() {
+    return false;
+  }
+
+  // Future<void> scheduleAlarm(DateTime alarmTime, sound,index,loopInterval) async {
+  //   _alarmTime = alarmTime;
+
+  //   // Schedule the first notification
+  //   await scheduleNotification(index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
+
+  //   // Schedule additional notifications with a 10-minute interval
+  //   for (int i = 1; i <= 100; i++) {
+  //     final additionalNotificationTime =
+  //         _alarmTime.add(Duration(minutes: loopInterval * i));
+
+  //     await scheduleNotification(
+  //         i, 'it\'s Time ⏰', 'Ringing ⏰', additionalNotificationTime, sound);
+
+  //     String audioPath = 'assets/sounds/${sound}.mp3';
+  //     print("audioPath $audioPath");
+  //     await playMusic(sound);
+  //   }
+  // }
 
   Future<void> playMusic(String audioPath) async {
     // await audioPlayer.setSourceUrl(audioPath);
@@ -99,4 +137,3 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 }
-

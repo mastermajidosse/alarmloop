@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'cubit/alarm_cubit.dart';
-import 'cubit/day_selection_cubit.dart';
 import 'cubit/notification_cubit.dart';
 import 'cubit/set_alarm_time_cubit.dart';
 import 'cubit/sounds_cubut.dart';
@@ -46,9 +45,6 @@ class MyApp extends StatelessWidget {
             providers: [
               BlocProvider<AlarmCubit>(
                 create: (BuildContext context) => AlarmCubit(),
-              ),
-              BlocProvider<DaySelectionCubit>(
-                create: (BuildContext context) => DaySelectionCubit(),
               ),
               BlocProvider<SoundsCubit>(
                 create: (BuildContext context) => SoundsCubit(),

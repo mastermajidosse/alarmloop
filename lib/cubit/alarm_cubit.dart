@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:alarmloop/cubit/notification_cubit.dart';
 import 'package:alarmloop/model/alarm_model.dart';
 import 'package:alarmloop/ui/edit/updated_edited_screen.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -21,10 +22,7 @@ class AlarmCubit extends Cubit<AlarmState> {
           alarms: [],
           indexSelectedAlarm: -1,
         ));
- 
 
-
- 
   SharedPreferences? prefs;
 
   Future<bool> initPrefs() async {
@@ -48,12 +46,13 @@ class AlarmCubit extends Cubit<AlarmState> {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
   }
-  
+
   void loadSoundAsset() async {
     final ByteData data = await rootBundle.load('assets/sounds/alarm.wav');
     final List<int> bytes = data.buffer.asUint8List();
     print('Loaded ${bytes.length} bytes from assets/sounds/alarm.wav');
   }
+
   Future<void> loadAlarms() async {
     if (prefs == null) {
       await initPrefs();
@@ -173,8 +172,6 @@ class AlarmCubit extends Cubit<AlarmState> {
     ));
   }
 
-  
-
   void turnOnCheckBox(int id) {
     state.alarms[state.indexSelectedAlarm].isEnabled = true;
     emit(AlarmState(
@@ -184,8 +181,10 @@ class AlarmCubit extends Cubit<AlarmState> {
     ));
   }
 
-  void turnOffCheckBox(int id) {
+  void turnOffCheckBox(int id, BuildContext context) {
+    final notificationCubit = BlocProvider.of<NotificationCubit>(context);
     state.alarms[state.indexSelectedAlarm].isEnabled = false;
+    notificationCubit.userCancelledNotification();
     emit(
       AlarmState(
         alarms: state.alarms,
@@ -194,7 +193,8 @@ class AlarmCubit extends Cubit<AlarmState> {
       ),
     );
   }
-void turnOffSwitch(int id) async {
+
+  void turnOffSwitch(int id) async {
     // deactivate the alarm
     AndroidAlarmManager.cancel(id);
     // show visual feedback to user
@@ -217,6 +217,7 @@ void turnOffSwitch(int id) async {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
   }
+
   void turnOnSwitch(int id) async {
     // deactivate the alarm
     AndroidAlarmManager.cancel(id);
@@ -435,7 +436,7 @@ void turnOffSwitch(int id) async {
     ));
   }
 
-  void addNewAlarm(BuildContext context) async{
+  void addNewAlarm(BuildContext context) async {
     state.indexSelectedAlarm = state.alarms.length;
     state.alarms.add(
       AlarmModel(
@@ -450,7 +451,6 @@ void turnOffSwitch(int id) async {
     ));
 
     Navigator.pushNamed(context, UpdatedEditAlarmForm.routeName);
-    
   }
 
   void saveAlarm(BuildContext context) async {
