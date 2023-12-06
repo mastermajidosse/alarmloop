@@ -12,7 +12,6 @@ import 'package:timezone/data/latest.dart' as tzdata;
 
 class NotificationCubit extends Cubit<NotificationState> {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-
   bool _isInitialized = false;
   bool timezoneInit = false;
   AudioPlayer audioPlayer = AudioPlayer();
@@ -38,14 +37,13 @@ class NotificationCubit extends Cubit<NotificationState> {
   Future<void> scheduleAlarm(
       DateTime alarmTime, String sound, int index, int loopInterval) async {
     // Schedule the first notification
-    await scheduleNotification(
-        index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
+    // await scheduleNotification(
+    //     index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
 
     Timer? periodicTimer;
 
     // Schedule additional notifications with the specified interval
-    periodicTimer =
-        Timer.periodic(Duration(minutes: loopInterval), (timer) async {
+    periodicTimer = Timer.periodic(Duration(minutes: loopInterval), (timer) async {
       final additionalNotificationTime =
           DateTime.now().add(Duration(minutes: loopInterval));
       await scheduleNotification(
