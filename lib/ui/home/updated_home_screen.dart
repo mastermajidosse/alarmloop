@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:alarmloop/cubit/notification_cubit.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -118,9 +119,8 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                             if (value == true) {
                                               bloc.turnOnCheckBox(alarm.id);
                                             } else {
-                                              bloc.turnOffCheckBox(
-                                                  alarm.id, context);
-                                              // BlocProvider.of<AlarmCubit>(context).cancelEditAlarm(context);
+                                              bloc.turnOffCheckBox(alarm.id, context);
+                                              BlocProvider.of<NotificationCubit>(context).cancelNotifications(alarm.id);
                                             }
                                             print(
                                                 'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');

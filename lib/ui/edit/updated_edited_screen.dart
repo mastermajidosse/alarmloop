@@ -29,8 +29,6 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
- 
-
   @override
   Widget build(BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
@@ -309,12 +307,13 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                         ),
                         Switch(
                           value: alarm.isEnabled,
-                          onChanged: (value)async {
+                          onChanged: (value) async {
                             if (value == true) {
                               bloc.turnOnCheckBox(alarm.id);
                             } else {
                               bloc.turnOffCheckBox(alarm.id, context);
-                              await flutterLocalNotificationsPlugin.cancel(alarm.id);  
+                              BlocProvider.of<NotificationCubit>(context)
+                                  .cancelNotifications(alarm.id);
                             }
                             print("isEnabled$value");
                           },
@@ -375,7 +374,6 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
                     int hours = ringTime.hour;
                     int minutes = ringTime.minute;
-
                     final moroccoTimeZone = tz.getLocation('Africa/Casablanca');
                     final now = tz.TZDateTime.now(moroccoTimeZone);
                     final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
@@ -390,6 +388,10 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                           alarm.id,
                           extractLoopInterval(alarm.loopInterval),
                           alarm.isEnabled);
+                    } else {
+                      BlocProvider.of<NotificationCubit>(context)
+                          .cancelNotifications(alarm.id);
+                      print("isEnabled::>${alarm.isEnabled}");
                     }
                   },
                   // onPressed: () => _saveAlarm(context),
