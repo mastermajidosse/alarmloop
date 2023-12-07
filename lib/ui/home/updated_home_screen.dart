@@ -28,7 +28,8 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
   @override
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
-
+    // int selectedAlarmIndex = bloc.state.indexSelectedAlarm ?? 0;
+    // AlarmModel alarm = bloc.state.alarms[selectedAlarmIndex];
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context)..loadAlarms(),
       child: Scaffold(
@@ -113,7 +114,16 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                         Switch.adaptive(
                                           value: alarm.isEnabled,
                                           onChanged: (value) {
-                                            print('Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
+                                            print("value");
+                                            if (value == true) {
+                                              bloc.turnOnCheckBox(alarm.id);
+                                            } else {
+                                              bloc.turnOffCheckBox(
+                                                  alarm.id, context);
+                                              // BlocProvider.of<AlarmCubit>(context).cancelEditAlarm(context);
+                                            }
+                                            print(
+                                                'Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
                                           },
                                           activeTrackColor: Style.blackClr,
                                           activeColor: Style.greenClr,
@@ -146,6 +156,4 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
       ),
     );
   }
-
-
 }

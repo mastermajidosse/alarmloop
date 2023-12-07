@@ -25,6 +25,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     if (!_isInitialized) {
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/launcher_icon');
+
       final InitializationSettings initializationSettings =
           InitializationSettings(
         android: initializationSettingsAndroid,
@@ -34,39 +35,33 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> scheduleAlarm(
-      DateTime alarmTime, String sound, int index, int loopInterval) async {
+  Future<void> scheduleAlarm(DateTime alarmTime, String sound, int index,
+      int loopInterval, bool isEnabled) async {
     // Schedule the first notification
     // await scheduleNotification(
     //     index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
-
-    Timer? periodicTimer;
-
-    // Schedule additional notifications with the specified interval
-    periodicTimer = Timer.periodic(Duration(minutes: loopInterval), (timer) async {
-      final additionalNotificationTime =
-          DateTime.now().add(Duration(minutes: loopInterval));
-      await scheduleNotification(
-        timer.tick, // Use tick as an index for additional notifications
-        'it\'s Time ⏰',
-        'Ringing ⏰',
-        additionalNotificationTime,
-        sound,
-      );
-
-      String audioPath = 'assets/sounds/$sound.mp3';
-      print("audioPath $audioPath");
-      await playMusic(sound);
-
-      // You can add a condition to cancel the timer if needed
-      if (userCancelledNotification()) {
-        periodicTimer?.cancel();
-      }
-    });
+    if (isEnabled) {
+      Timer? periodicTimer;
+      // Schedule additional notifications with the specified interval
+      periodicTimer =
+          Timer.periodic(Duration(minutes: loopInterval), (timer) async {
+        final additionalNotificationTime =
+            DateTime.now().add(Duration(minutes: loopInterval));
+        await scheduleNotification(
+          timer.tick,
+          'it\'s Time ⏰',
+          'Ringing ⏰',
+          additionalNotificationTime,
+          sound,
+        );
+      });
+    }
   }
 
-  bool userCancelledNotification() {
-    return false;
+  Future<void> cancelNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
+    // You can also cancel specific notifications by providing the notification IDs:
+    // await flutterLocalNotificationsPlugin.cancel(notificationId);
   }
 
   // Future<void> scheduleAlarm(DateTime alarmTime, sound,index,loopInterval) async {
@@ -109,11 +104,13 @@ class NotificationCubit extends Cubit<NotificationState> {
       NotificationDetails(
         android: AndroidNotificationDetails(
           id.toString(),
-          'new channel',
+          id.toString(),
           channelShowBadge: true,
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
+          ongoing: true, // Set as ongoing to make it persistent
+          autoCancel:false, // Set autoCancel to false to make it non-dismissable
           // channelDescription: 'TRYING TO PUSH UU',
           sound: RawResourceAndroidNotificationSound(sound),
           icon: 'launcher_icon',

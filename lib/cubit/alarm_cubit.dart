@@ -184,7 +184,7 @@ class AlarmCubit extends Cubit<AlarmState> {
   void turnOffCheckBox(int id, BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
     state.alarms[state.indexSelectedAlarm].isEnabled = false;
-    notificationCubit.userCancelledNotification();
+    // notificationCubit.userCancelledNotification();
     emit(
       AlarmState(
         alarms: state.alarms,
