@@ -15,7 +15,6 @@ class NotificationCubit extends Cubit<NotificationState> {
   bool _isInitialized = false;
   bool timezoneInit = false;
   AudioPlayer audioPlayer = AudioPlayer();
-  late DateTime _alarmTime;
 
   NotificationCubit()
       : flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin(),
@@ -25,6 +24,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     if (!_isInitialized) {
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/launcher_icon');
+
       final InitializationSettings initializationSettings =
           InitializationSettings(
         android: initializationSettingsAndroid,
@@ -35,29 +35,29 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 
   Future<void> scheduleAlarm(
-      DateTime alarmTime, String sound, int index, dynamic loopInterval) async {
-    if (loopInterval == "1 min") {
+      DateTime alarmTime, String sound, int index, String loopInterval) async {
+    if (loopInterval == '1 min') {
       await scheduleNotification(
-        index, // Use tick as an index for additional notifications
+        index,
         'it\'s Time ⏰',
         'Ringing ⏰',
         RepeatInterval.everyMinute,
         sound,
       );
-    } else if (loopInterval == "1 h") {
+    } else if (loopInterval == '1 h') {
       await scheduleNotification(
-        index, // Use tick as an index for additional notifications
+        index,
         'it\'s Time ⏰',
         'Ringing ⏰',
         RepeatInterval.hourly,
         sound,
       );
     } else {
-      print("get out from range");
+      print('Get out from the stack');
     }
   }
 
-  Future cancelN(int id) async{
+  Future<void> cancelN(id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
 
@@ -101,11 +101,14 @@ class NotificationCubit extends Cubit<NotificationState> {
       NotificationDetails(
         android: AndroidNotificationDetails(
           id.toString(),
-          'channel Number Id$id',
+          "Channel Id $id",
           channelShowBadge: true,
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
+          ongoing: true, // Set as ongoing to make it persistent
+          autoCancel:
+              false, // Set autoCancel to false to make it non-dismissable
           // channelDescription: 'TRYING TO PUSH UU',
           sound: RawResourceAndroidNotificationSound(sound),
           icon: 'launcher_icon',

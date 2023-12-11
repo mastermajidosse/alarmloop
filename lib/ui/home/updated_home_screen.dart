@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:alarmloop/cubit/notification_cubit.dart';
 import 'package:alarmloop/utils/style.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -28,7 +29,8 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
   @override
   Widget build(BuildContext context) {
     AlarmCubit bloc = BlocProvider.of<AlarmCubit>(context);
-
+    // int selectedAlarmIndex = bloc.state.indexSelectedAlarm ?? 0;
+    // AlarmModel alarm = bloc.state.alarms[selectedAlarmIndex];
     return BlocProvider.value(
       value: BlocProvider.of<AlarmCubit>(context)..loadAlarms(),
       child: Scaffold(
@@ -110,16 +112,6 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
                                             ),
                                           ],
                                         ),
-                                        Switch.adaptive(
-                                          value: alarm.isEnabled,
-                                          onChanged: (value) {
-                                            print('Alarm ${alarm.title} is ${value ? 'on' : 'off'}');
-                                          },
-                                          activeTrackColor: Style.blackClr,
-                                          activeColor: Style.greenClr,
-                                          inactiveThumbColor: Style.blackClr,
-                                          inactiveTrackColor: Style.greyColor,
-                                        ),
                                       ],
                                     ),
                                     SizedBox(height: 4),
@@ -146,6 +138,4 @@ class _UpdatedHomeScreenState extends State<UpdatedHomeScreen> {
       ),
     );
   }
-
-
 }
