@@ -552,18 +552,22 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                       int hours = ringTime.hour;
                       int minutes = ringTime.minute;
 
-                      final moroccoTimeZone = tz.getLocation('Africa/Casablanca');
+                      final moroccoTimeZone =
+                          tz.getLocation('Africa/Casablanca');
                       final now = tz.TZDateTime.now(moroccoTimeZone);
-                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,now.month, now.day, hours, minutes);
+                      final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
+                          now.month, now.day, hours, minutes);
                       print("Local Time: ${alarmTime.toLocal()}");
                       print("Local Time: $alarmTime");
+                      print(" loopInterval: ${alarm.loopInterval}");
                       bloc.saveAlarm(context);
+
                       if (alarm.isEnabled) {
                         await notificationCubit.scheduleAlarm(
                           alarmTime,
                           alarm.sound.sound.split('.')[0],
                           alarm.id,
-                          extractLoopInterval(alarm.loopInterval),
+                          alarm.loopInterval,
                         );
                       }
                     },

@@ -35,38 +35,30 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 
   Future<void> scheduleAlarm(
-      DateTime alarmTime, String sound, int index, int loopInterval) async {
-    // Schedule the first notification
-    // await scheduleNotification(
-    //     index, 'it\'s Time', 'Ringing ⏰', alarmTime, sound);
-
-    Timer? periodicTimer;
-
-    // Schedule additional notifications with the specified interval
-    periodicTimer = Timer.periodic(Duration(minutes: loopInterval), (timer) async {
-      final additionalNotificationTime =
-          DateTime.now().add(Duration(minutes: loopInterval));
+      DateTime alarmTime, String sound, int index, dynamic loopInterval) async {
+    if (loopInterval == "1 min") {
       await scheduleNotification(
-        timer.tick, // Use tick as an index for additional notifications
+        index, // Use tick as an index for additional notifications
         'it\'s Time ⏰',
         'Ringing ⏰',
-        additionalNotificationTime,
+        RepeatInterval.everyMinute,
         sound,
       );
-
-      String audioPath = 'assets/sounds/$sound.mp3';
-      print("audioPath $audioPath");
-      await playMusic(sound);
-
-      // You can add a condition to cancel the timer if needed
-      if (userCancelledNotification()) {
-        periodicTimer?.cancel();
-      }
-    });
+    } else if (loopInterval == "1 h") {
+      await scheduleNotification(
+        index, // Use tick as an index for additional notifications
+        'it\'s Time ⏰',
+        'Ringing ⏰',
+        RepeatInterval.hourly,
+        sound,
+      );
+    } else {
+      print("get out from range");
+    }
   }
 
-  bool userCancelledNotification() {
-    return false;
+  Future cancelN(int id) async{
+    await flutterLocalNotificationsPlugin.cancel(id);
   }
 
   // Future<void> scheduleAlarm(DateTime alarmTime, sound,index,loopInterval) async {
@@ -98,18 +90,18 @@ class NotificationCubit extends Cubit<NotificationState> {
     int id,
     String title,
     String body,
-    DateTime scheduledTime,
+    RepeatInterval interval,
     sound,
   ) async {
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    await flutterLocalNotificationsPlugin.periodicallyShow(
       id,
       title,
       body,
-      tz.TZDateTime.from(scheduledTime, tz.local),
+      interval,
       NotificationDetails(
         android: AndroidNotificationDetails(
           id.toString(),
-          'new channel',
+          'channel Number Id$id',
           channelShowBadge: true,
           importance: Importance.high,
           priority: Priority.high,
@@ -120,8 +112,6 @@ class NotificationCubit extends Cubit<NotificationState> {
         ),
       ),
       androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'notification_$id',
     );
   }

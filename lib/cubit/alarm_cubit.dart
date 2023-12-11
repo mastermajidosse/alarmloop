@@ -8,6 +8,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -180,11 +181,16 @@ class AlarmCubit extends Cubit<AlarmState> {
       indexSelectedAlarm: state.indexSelectedAlarm,
     ));
   }
+  // FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin=FlutterLocalNotificationsPlugin();
+// 
+  //  Future cancelN(int id) async{
+  //   await flutterLocalNotificationsPlugin.cancel(id);
+  // }
 
   void turnOffCheckBox(int id, BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
     state.alarms[state.indexSelectedAlarm].isEnabled = false;
-    notificationCubit.userCancelledNotification();
+    notificationCubit.cancelN(id);
     emit(
       AlarmState(
         alarms: state.alarms,
