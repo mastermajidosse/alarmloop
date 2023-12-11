@@ -312,6 +312,8 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                               bloc.turnOnCheckBox(alarm.id);
                             } else {
                               bloc.turnOffCheckBox(alarm.id, context);
+                              BlocProvider.of<NotificationCubit>(context)
+                                  .cancelN(alarm.id);
                             }
                             print("isEnabled$value");
                           },

@@ -57,8 +57,9 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> cancelN(id) async {
+  Future cancelN(id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
+    print('the notification has been canceld successfully');
   }
 
   // Future<void> scheduleAlarm(DateTime alarmTime, sound,index,loopInterval) async {
