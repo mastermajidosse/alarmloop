@@ -1,8 +1,21 @@
-class NotificationState {}
+import 'package:flutter/material.dart';
 
-class NotificationInitialState extends NotificationState {
-  
-}
-class TimeZoneInitialState extends NotificationState {
+class NotificationState {
+  final List<Notification>? notificationsScheduled;
+  final String? error;
 
+  NotificationState({
+    this.notificationsScheduled,
+    this.error,
+  });
+
+  NotificationState copyWith({
+    List<Notification>? notificationsScheduled,
+    String? error,
+  }) {
+    return NotificationState(
+      notificationsScheduled: notificationsScheduled ?? this.notificationsScheduled,
+      error: error ?? this.error,
+    );
+  }
 }

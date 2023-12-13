@@ -1,7 +1,4 @@
-import 'dart:isolate';
-import 'package:alarmloop/core/core.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,13 +7,8 @@ import 'cubit/notification_cubit.dart';
 import 'cubit/set_alarm_time_cubit.dart';
 import 'cubit/sounds_cubut.dart';
 import 'ui/home/splash_screen.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'utils/routes.dart';
-
-
-
-
 
 
 void main() async {

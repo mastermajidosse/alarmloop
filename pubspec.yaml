@@ -41,7 +41,6 @@ dependencies:
   audioplayers: ^1.0.1
   shared_preferences: ^2.0.15
   android_alarm_manager_plus: ^2.0.6
-  flutter_local_notifications: ^9.7.0
   fluttertoast: ^8.0.9
   just_audio: ^0.9.36
   timezone: ^0.8.0

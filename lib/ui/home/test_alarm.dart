@@ -306,130 +306,130 @@
 
 //:::::::::::::::::::::::::::::::::::::::::
 
-import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
+// import 'dart:async';
+// import 'package:audioplayers/audioplayers.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:timezone/timezone.dart' as tz;
 
-class AlarmScreen extends StatefulWidget {
-  @override
-  _AlarmScreenState createState() => _AlarmScreenState();
-}
+// class AlarmScreen extends StatefulWidget {
+//   @override
+//   _AlarmScreenState createState() => _AlarmScreenState();
+// }
 
-class _AlarmScreenState extends State<AlarmScreen> {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  late StreamController<int> _countdownController;
-  late Stream<int> _countdownStream;
-  late DateTime _alarmTime;
+// class _AlarmScreenState extends State<AlarmScreen> {
+//   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//       FlutterLocalNotificationsPlugin();
+//   late StreamController<int> _countdownController;
+//   late Stream<int> _countdownStream;
+//   late DateTime _alarmTime;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeNotifications();
-    _countdownController = StreamController<int>();
-    _countdownStream = _countdownController.stream.asBroadcastStream();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initializeNotifications();
+//     _countdownController = StreamController<int>();
+//     _countdownStream = _countdownController.stream.asBroadcastStream();
+//   }
 
-  Future<void> _initializeNotifications() async {
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
+//   Future<void> _initializeNotifications() async {
+//     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+//     const AndroidInitializationSettings initializationSettingsAndroid =
+//         AndroidInitializationSettings('@mipmap/ic_launcher');
+//     final InitializationSettings initializationSettings =
+//         InitializationSettings(
+//       android: initializationSettingsAndroid,
+//     );
+//     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+//   }
 
-  Future<void> _scheduleAlarm(DateTime alarmTime) async {
-    // Set the alarm time
-    _alarmTime = alarmTime;
+//   Future<void> _scheduleAlarm(DateTime alarmTime) async {
+//     // Set the alarm time
+//     _alarmTime = alarmTime;
 
-    // Calculate the duration until the alarm time
-    final durationUntilAlarm = _alarmTime.difference(DateTime.now());
+//     // Calculate the duration until the alarm time
+//     final durationUntilAlarm = _alarmTime.difference(DateTime.now());
 
-    // Create a stream that emits a count of seconds until the alarm time
-    _countdownStream = Stream.periodic(Duration(seconds: 1), (count) {
-      var remainingSeconds = durationUntilAlarm.inSeconds - count;
-      return remainingSeconds > 0 ? remainingSeconds : 0;
-    }).take(durationUntilAlarm.inSeconds);
+//     // Create a stream that emits a count of seconds until the alarm time
+//     _countdownStream = Stream.periodic(Duration(seconds: 1), (count) {
+//       var remainingSeconds = durationUntilAlarm.inSeconds - count;
+//       return remainingSeconds > 0 ? remainingSeconds : 0;
+//     }).take(durationUntilAlarm.inSeconds);
 
-    // Schedule the notification
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'alarm_channel_id',
-      'Alarm Channel',
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-    );
-    const IOSNotificationDetails iOSPlatformChannelSpecifics =
-        IOSNotificationDetails();
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
+//     // Schedule the notification
+//     const AndroidNotificationDetails androidPlatformChannelSpecifics =
+//         AndroidNotificationDetails(
+//       'alarm_channel_id',
+//       'Alarm Channel',
+//       importance: Importance.high,
+//       priority: Priority.high,
+//       playSound: true,
+//     );
+//     const IOSNotificationDetails iOSPlatformChannelSpecifics =
+//         IOSNotificationDetails();
+//     const NotificationDetails platformChannelSpecifics = NotificationDetails(
+//       android: androidPlatformChannelSpecifics,
+//       iOS: iOSPlatformChannelSpecifics,
+//     );
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Alarm',
-      'Wake up! It\'s time!',
-      tz.TZDateTime.from(alarmTime, tz.local),
-      platformChannelSpecifics,
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+//     await flutterLocalNotificationsPlugin.zonedSchedule(
+//       0,
+//       'Alarm',
+//       'Wake up! It\'s time!',
+//       tz.TZDateTime.from(alarmTime, tz.local),
+//       platformChannelSpecifics,
+//       androidAllowWhileIdle: true,
+//       uiLocalNotificationDateInterpretation:
+//           UILocalNotificationDateInterpretation.absoluteTime,
+//     );
 
-    // Play the alarm sound when the alarm time arrives
-    // _countdownStream.listen((remainingSeconds) {
-    // if (remainingSeconds == 1) {
-    // final audioPlayer = AudioPlayer();
-    // final alarmSound =
-    //     'alarm_sound.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+//     // Play the alarm sound when the alarm time arrives
+//     // _countdownStream.listen((remainingSeconds) {
+//     // if (remainingSeconds == 1) {
+//     // final audioPlayer = AudioPlayer();
+//     // final alarmSound =
+//     //     'alarm_sound.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
 
-    // audioPlayer.play(UrlSource(alarmSound));
-    // }
-    // });
-  }
+//     // audioPlayer.play(UrlSource(alarmSound));
+//     // }
+//     // });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Alarm App'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                final alarmTime = DateTime.now().add(Duration(seconds: 10));
-                await _scheduleAlarm(alarmTime);
-                final audioPlayer = AudioPlayer();
-                final alarmSound ='sounds/2.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Flutter Alarm App'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             ElevatedButton(
+//               onPressed: () async {
+//                 final alarmTime = DateTime.now().add(Duration(seconds: 10));
+//                 await _scheduleAlarm(alarmTime);
+//                 final audioPlayer = AudioPlayer();
+//                 final alarmSound ='sounds/2.mp3'; // Make sure 'alarm_sound.mp3' exists in your assets folder
 
-                audioPlayer.play(UrlSource(alarmSound));
-              },
-              child: Text('Set Alarm in 10 seconds'),
-            ),
-            SizedBox(height: 20),
-            StreamBuilder<int>(
-              stream: _countdownStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text('Time remaining: ${snapshot.data} seconds');
-                } else {
-                  return Container();
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//                 audioPlayer.play(UrlSource(alarmSound));
+//               },
+//               child: Text('Set Alarm in 10 seconds'),
+//             ),
+//             SizedBox(height: 20),
+//             StreamBuilder<int>(
+//               stream: _countdownStream,
+//               builder: (context, snapshot) {
+//                 if (snapshot.hasData) {
+//                   return Text('Time remaining: ${snapshot.data} seconds');
+//                 } else {
+//                   return Container();
+//                 }
+//               },
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

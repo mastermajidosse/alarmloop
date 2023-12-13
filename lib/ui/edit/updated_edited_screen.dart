@@ -1,7 +1,6 @@
 import 'package:alarmloop/model/alarm_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../core/core.dart';
@@ -26,9 +25,6 @@ class UpdatedEditAlarmForm extends StatefulWidget {
 }
 
 class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   @override
   Widget build(BuildContext context) {
     final notificationCubit = BlocProvider.of<NotificationCubit>(context);
@@ -74,61 +70,61 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                !alarm.isAm
-                    ? Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.rotationY(3.14),
-                        child: Icon(
-                          Icons.dark_mode_outlined,
-                          size: 30.0,
-                          color: Colors.grey,
-                        ),
-                      )
-                    : Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.rotationY(3.14),
-                        child: Icon(
-                          Icons.wb_sunny,
-                          size: 30.0,
-                          color: Colors.orange,
-                        ),
-                      ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () => bloc.selectAlarmTime(context),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: BlocBuilder<AlarmCubit, AlarmState>(
-                              builder: (context, state) {
-                                return Text(
-                                  alarm.ringTime,
-                                  style: TextStyle(
-                                    fontSize: 30.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            bloc.setIsAm() ? 'AM' : 'PM',
-                            style: Style.textStyleBtn(),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
+                // !alarm.isAm
+                //     ? Transform(
+                //         alignment: Alignment.center,
+                //         transform: Matrix4.rotationY(3.14),
+                //         child: Icon(
+                //           Icons.dark_mode_outlined,
+                //           size: 30.0,
+                //           color: Colors.grey,
+                //         ),
+                //       )
+                //     : Transform(
+                //         alignment: Alignment.center,
+                //         transform: Matrix4.rotationY(3.14),
+                //         child: Icon(
+                //           Icons.wb_sunny,
+                //           size: 30.0,
+                //           color: Colors.orange,
+                //         ),
+                //       ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     GestureDetector(
+                //       onTap: () => bloc.selectAlarmTime(context),
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           GestureDetector(
+                //             onTap: () {},
+                //             child: BlocBuilder<AlarmCubit, AlarmState>(
+                //               builder: (context, state) {
+                //                 return Text(
+                //                   alarm.ringTime,
+                //                   style: TextStyle(
+                //                     fontSize: 30.sp,
+                //                     fontWeight: FontWeight.w500,
+                //                   ),
+                //                 );
+                //               },
+                //             ),
+                //           ),
+                //           SizedBox(width: 10),
+                //           Text(
+                //             bloc.setIsAm() ? 'AM' : 'PM',
+                //             style: Style.textStyleBtn(),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //     const Icon(
+                //       Icons.arrow_forward_ios_rounded,
+                //       color: Colors.white,
+                //     ),
+                //   ],
+                // ),
                 Image.asset('assets/images/horloge.png'),
                 GestureDetector(
                   onTap: () {
@@ -312,8 +308,8 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                               bloc.turnOnCheckBox(alarm.id);
                             } else {
                               bloc.turnOffCheckBox(alarm.id, context);
-                              BlocProvider.of<NotificationCubit>(context)
-                                  .cancelN(alarm.id);
+                              // BlocProvider.of<NotificationCubit>(context)
+                              //     .cancelN(alarm.id);
                             }
                             print("isEnabled$value");
                           },
@@ -371,18 +367,16 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     foregroundColor: MaterialStateProperty.all(Style.blackClr),
                   ),
                   onPressed: () async {
-                    DateTime ringTime = DateFormat.Hm().parse(alarm.ringTime);
-                    int hours = ringTime.hour;
-                    int minutes = ringTime.minute;
                     final moroccoTimeZone = tz.getLocation('Africa/Casablanca');
                     final now = tz.TZDateTime.now(moroccoTimeZone);
-                    final alarmTime = tz.TZDateTime(moroccoTimeZone, now.year,
-                        now.month, now.day, hours, minutes);
-                    print("Local Time: ${alarmTime.toLocal()}");
-                    print("Local Time: $alarmTime");
+                    int hours = now.hour;
+                    int minutes = now.minute;
+                    dynamic ringTime = '$hours:$minutes';
+                    alarm.ringTime = ringTime;
+                    print("Local Time: ${tz.TZDateTime.now(moroccoTimeZone)}");
                     bloc.saveAlarm(context);
                     await notificationCubit.scheduleAlarm(
-                      alarmTime,
+                      tz.TZDateTime.now(moroccoTimeZone),
                       alarm.sound.sound.split('.')[0],
                       alarm.id,
                       alarm.loopInterval,
@@ -400,26 +394,5 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
         ),
       ),
     );
-  }
-
-  String getDayName(int index) {
-    switch (index) {
-      case 0:
-        return 'Monday';
-      case 1:
-        return 'Tuesday';
-      case 2:
-        return 'Wednesday';
-      case 3:
-        return 'Thursday';
-      case 4:
-        return 'Friday';
-      case 5:
-        return 'Saturday';
-      case 6:
-        return 'Sunday';
-      default:
-        return '';
-    }
   }
 }
