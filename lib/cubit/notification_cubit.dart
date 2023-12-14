@@ -188,161 +188,248 @@
 //   }
 // import 'dart:async';
 
-import 'package:alarmloop/core/constant.dart';
-import 'package:alarmloop/utils/style.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:bloc/bloc.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:alarmloop/core/constant.dart';
+// import 'package:alarmloop/utils/style.dart';
+// import 'package:audioplayers/audioplayers.dart';
+// import 'package:bloc/bloc.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:flutter/material.dart';
+// import 'notification_state.dart';
+// import 'package:timezone/timezone.dart' as tz;
+// import 'package:timezone/data/latest.dart' as tzdata;
+
+// class NotificationCubit extends Cubit<NotificationState> {
+//   final AudioPlayer audioPlayer = AudioPlayer();
+//   final AwesomeNotifications notifications = AwesomeNotifications();
+//   bool _isInitialized = false;
+//   bool timezoneInit = false;
+
+//   NotificationCubit() : super(NotificationState());
+
+//   Future<void> initialize() async {
+//     if (!_isInitialized) {
+//       await notifications.initialize(
+//         'resource://drawable/launcher_icon', // Example icon path, replace with your own
+//         [
+//           NotificationChannel(
+//             channelKey: 'basic_channel',
+//             channelName: 'Basic notifications',
+//             channelDescription: 'Notification channel for basic notifications',
+//             defaultColor: Color(0xFF9D50DD),
+//             ledColor: Colors.white,
+//           ),
+//         ],
+//       );
+//       _isInitialized = true;
+//     }
+//     if (!timezoneInit) {
+//       tzdata.initializeTimeZones();
+//       tz.setLocalLocation(tz.getLocation('Africa/Casablanca'));
+//       timezoneInit = true;
+//     }
+//   }
+
+//   Future<void> scheduleAlarm(
+//     DateTime alarmTime,
+//     String sound,
+//     int index,
+//     String loopInterval,
+//   ) async {
+//     await initialize();
+
+//     if (loopInterval == null ||
+//         !Constants.validLoopIntervals.contains(loopInterval)) {
+//       emit(state.copyWith(error: 'Invalid loop interval: $loopInterval'));
+//       return;
+//     }
+
+//     if (alarmTime.isBefore(tz.TZDateTime.now(tz.getLocation('Africa/Casablanca')))) {
+//       emit(state.copyWith(error: 'Alarm time cannot be in the past.'));
+//       return;
+//     }
+
+//     switch (loopInterval) {
+//       case '1 min':
+//         await scheduleMinuteLoopNotifications(alarmTime, sound, index);
+//         break;
+//       case '1 h':
+//         await scheduleHourlyLoopNotifications(alarmTime, sound, index);
+//         break;
+//       case '20 min':
+//         await scheduleTwentyMinuteLoopNotifications(alarmTime, sound, index);
+//         break;
+//       default:
+//         emit(state.copyWith(error: 'Unsupported loop interval: $loopInterval'));
+//         break;
+//     }
+//   }
+
+//   Future<void> scheduleHourlyLoopNotifications(
+//     DateTime startTime,
+//     String sound,
+//     int index,
+//   ) async {
+//     final notificationsScheduled = [];
+//     for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
+//       final notificationTime = startTime.add(Duration(minutes: 20 * i));
+//       await scheduleNotification(
+//         index + i,
+//         'it\'s Time ⏰',
+//         'Ringing ⏰',
+//         notificationTime,
+//         sound,
+//       );
+//     }
+//   }
+
+//   Future<void> scheduleMinuteLoopNotifications(
+//     DateTime startTime,
+//     String sound,
+//     int index,
+//   ) async {
+//     final notificationsScheduled = [];
+//     for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
+//       final notificationTime = startTime.add(Duration(minutes: 20 * i));
+//       await scheduleNotification(
+//         index + i,
+//         'it\'s Time ⏰',
+//         'Ringing ⏰',
+//         notificationTime,
+//         sound,
+//       );
+//     }
+//   }
+
+//   Future<void> scheduleTwentyMinuteLoopNotifications(
+//     DateTime startTime,
+//     String sound,
+//     int index,
+//   ) async {
+//     final notificationsScheduled = [];
+//     for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
+//       final notificationTime = startTime.add(Duration(minutes: 20 * i));
+//       await scheduleNotification(
+//         index + i,
+//         'it\'s Time ⏰',
+//         'Ringing ⏰',
+//         notificationTime,
+//         sound,
+//       );
+//     }
+//   }
+
+//   Future<void> scheduleNotification(
+//     int id,
+//     String title,
+//     String body,
+//     DateTime notificationTime,
+//     String sound,
+//   ) async {
+//     await AwesomeNotifications().createNotification(
+//       content: NotificationContent(
+//         autoDismissible: false,
+//         wakeUpScreen:true,
+//         id: id,
+//         channelKey: 'basic_channel', // Use the channelKey you have defined
+//         title: title,
+//         body: body,
+//         payload: {'alarmId': id.toString()},
+//       ),
+//       schedule: NotificationCalendar(
+//         weekday: notificationTime.weekday,
+//         hour: notificationTime.hour,
+//         minute: notificationTime.minute,
+//         second: notificationTime.second,
+//         allowWhileIdle: true,
+//         repeats: true, // Set to true if you want the notification to repeat
+//       ),
+//     );
+//   }
+// }
+
+// notification_cubit.dart
+
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'notification_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tzdata;
+
+class NotificationState {}
 
 class NotificationCubit extends Cubit<NotificationState> {
-  final AudioPlayer audioPlayer = AudioPlayer();
   final AwesomeNotifications notifications = AwesomeNotifications();
-  bool _isInitialized = false;
-  bool timezoneInit = false;
 
   NotificationCubit() : super(NotificationState());
 
   Future<void> initialize() async {
-    if (!_isInitialized) {
-      await notifications.initialize(
-        'resource://drawable/launcher_icon', // Example icon path, replace with your own
-        [
-          NotificationChannel(
-            channelKey: 'basic_channel',
-            channelName: 'Basic notifications',
-            channelDescription: 'Notification channel for basic notifications',
-            defaultColor: Color(0xFF9D50DD),
-            ledColor: Colors.white,
-          ),
-        ],
-      );
-      _isInitialized = true;
-    }
-    if (!timezoneInit) {
-      tzdata.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation('Africa/Casablanca'));
-      timezoneInit = true;
-    }
-  }
-
-  Future<void> scheduleAlarm(
-    DateTime alarmTime,
-    String sound,
-    int index,
-    String loopInterval,
-  ) async {
-    await initialize();
-
-    if (loopInterval == null ||
-        !Constants.validLoopIntervals.contains(loopInterval)) {
-      emit(state.copyWith(error: 'Invalid loop interval: $loopInterval'));
-      return;
-    }
-
-    if (alarmTime.isBefore(tz.TZDateTime.now(tz.getLocation('Africa/Casablanca')))) {
-      emit(state.copyWith(error: 'Alarm time cannot be in the past.'));
-      return;
-    }
-
-    switch (loopInterval) {
-      case '1 min':
-        await scheduleMinuteLoopNotifications(alarmTime, sound, index);
-        break;
-      case '1 h':
-        await scheduleHourlyLoopNotifications(alarmTime, sound, index);
-        break;
-      case '20 min':
-        await scheduleTwentyMinuteLoopNotifications(alarmTime, sound, index);
-        break;
-      default:
-        emit(state.copyWith(error: 'Unsupported loop interval: $loopInterval'));
-        break;
-    }
-  }
-
-  Future<void> scheduleHourlyLoopNotifications(
-    DateTime startTime,
-    String sound,
-    int index,
-  ) async {
-    final notificationsScheduled = [];
-    for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
-      final notificationTime = startTime.add(Duration(minutes: 20 * i));
-      await scheduleNotification(
-        index + i,
-        'it\'s Time ⏰',
-        'Ringing ⏰',
-        notificationTime,
-        sound,
-      );
-    }
-  }
-
-  Future<void> scheduleMinuteLoopNotifications(
-    DateTime startTime,
-    String sound,
-    int index,
-  ) async {
-    final notificationsScheduled = [];
-    for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
-      final notificationTime = startTime.add(Duration(minutes: 20 * i));
-      await scheduleNotification(
-        index + i,
-        'it\'s Time ⏰',
-        'Ringing ⏰',
-        notificationTime,
-        sound,
-      );
-    }
-  }
-
-  Future<void> scheduleTwentyMinuteLoopNotifications(
-    DateTime startTime,
-    String sound,
-    int index,
-  ) async {
-    final notificationsScheduled = [];
-    for (int i = 0; i < Constants.durationInMinutes / 20; i++) {
-      final notificationTime = startTime.add(Duration(minutes: 20 * i));
-      await scheduleNotification(
-        index + i,
-        'it\'s Time ⏰',
-        'Ringing ⏰',
-        notificationTime,
-        sound,
-      );
-    }
+    await notifications.initialize(
+      'resource://drawable/launcher_icon',
+      [
+        NotificationChannel(
+          channelKey: 'basic_channel',
+          channelName: 'Basic notifications',
+          channelDescription: 'Notification channel for basic notifications',
+          defaultColor: Color(0xFF9D50DD),
+          ledColor: Colors.white,
+        ),
+      ],
+    );
   }
 
   Future<void> scheduleNotification(
     int id,
+    DateTime scheduledTime,
     String title,
     String body,
-    DateTime notificationTime,
-    String sound,
   ) async {
+    await initialize();
+
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        autoDismissible: false,
-        wakeUpScreen:true,
         id: id,
-        channelKey: 'basic_channel', // Use the channelKey you have defined
+        channelKey: 'basic_channel',
         title: title,
         body: body,
-        payload: {'alarmId': id.toString()},
       ),
       schedule: NotificationCalendar(
-        weekday: notificationTime.weekday,
-        hour: notificationTime.hour,
-        minute: notificationTime.minute,
-        second: notificationTime.second,
+        weekday: scheduledTime.weekday,
+        hour: scheduledTime.hour,
+        minute: scheduledTime.minute,
+        second: scheduledTime.second,
         allowWhileIdle: true,
-        repeats: true, // Set to true if you want the notification to repeat
+        repeats: false,
       ),
     );
+
+    emit(NotificationState());
+  }
+
+  Future<void> scheduleRepeatedNotifications(
+    int id,
+    DateTime initialTime,
+    String title,
+    String body,
+    int repeatIntervalInMinutes,
+    bool isEnabled,
+  ) async {
+    Timer.periodic(Duration(minutes: repeatIntervalInMinutes), (timer) async {
+      final scheduledTime =
+          initialTime.add(Duration(minutes: repeatIntervalInMinutes));
+      await scheduleNotification(id, scheduledTime, title, body);
+
+      if (!isEnabled) {
+        timer.cancel(); // Stop the periodic timer if not enabled
+        await cancelAllNotifications();
+      }
+      // Update the initial time for the next iteration
+      initialTime = scheduledTime;
+    });
+  }
+
+  Future<void> cancelAllNotifications() async {
+    await AwesomeNotifications().cancelAll();
+    emit(NotificationState());
   }
 }

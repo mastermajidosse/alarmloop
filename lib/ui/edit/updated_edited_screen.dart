@@ -308,10 +308,8 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                               bloc.turnOnCheckBox(alarm.id);
                             } else {
                               bloc.turnOffCheckBox(alarm.id, context);
-                              // BlocProvider.of<NotificationCubit>(context)
-                              //     .cancelN(alarm.id);
                             }
-                            print("isEnabled$value");
+                            print("isEnabled $value");
                           },
                           activeTrackColor: Style.blackClr,
                           activeColor: Style.greenClr,
@@ -374,12 +372,24 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     dynamic ringTime = '$hours:$minutes';
                     alarm.ringTime = ringTime;
                     print("Local Time: ${tz.TZDateTime.now(moroccoTimeZone)}");
+                    print("isEnabled::>${alarm.isEnabled}");
                     bloc.saveAlarm(context);
-                    await notificationCubit.scheduleAlarm(
-                      tz.TZDateTime.now(moroccoTimeZone),
-                      alarm.sound.sound.split('.')[0],
+                    // await notificationCubit.scheduleAlarm(
+                    //   tz.TZDateTime.now(moroccoTimeZone),
+                    //   alarm.sound.sound.split('.')[0],
+                    //   alarm.id,
+                    //   alarm.loopInterval,
+                    // );
+
+                    // Schedule 5 notifications every 10 minutes starting from now
+                    await notificationCubit.scheduleRepeatedNotifications(
                       alarm.id,
-                      alarm.loopInterval,
+                      now,
+                      'Alarm!',
+                      'It\'s time to wake up!',
+                      1,
+                      // int.parse(alarm.loopInterval),
+                      alarm.isEnabled,
                     );
                   },
                   // onPressed: () => _saveAlarm(context),
