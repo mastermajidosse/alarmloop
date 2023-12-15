@@ -380,16 +380,26 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     //   alarm.id,
                     //   alarm.loopInterval,
                     // );
-
                     // Schedule 5 notifications every 10 minutes starting from now
-                    await notificationCubit.scheduleRepeatedNotifications(
+                    // notificationCubit.scheduleNotificationFromWidget(
+                    //   alarm.id,
+                    //   DateTime.now().add(Duration(minutes: 1)), // Set initial time to current time
+                    //   'Alarm!',
+                    //   'It\'s time to wake up!',
+                    //   context
+                    //   // 1, // Repeat every 10 minutes
+                    //   // alarm.isEnabled,
+                    // );
+                    print("${alarm.sound.sound}");
+                    notificationCubit.scheduleRepeatedNotifications(
                       alarm.id,
-                      now,
+                      DateTime.now(), // Set initial time to current time
                       'Alarm!',
-                      'It\'s time to wake up!',
-                      1,
-                      // int.parse(alarm.loopInterval),
+                      'It\'s time to wake up!⏰',
+                      1, // Repeat every 10 minutes (you can get this value from user input)
                       alarm.isEnabled,
+                      context,
+                      alarm.sound.sound,
                     );
                   },
                   // onPressed: () => _saveAlarm(context),

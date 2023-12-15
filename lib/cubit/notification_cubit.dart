@@ -348,22 +348,20 @@
 // }
 
 // notification_cubit.dart
-
 import 'dart:async';
 
+import 'package:alarmloop/cubit/notification_state.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-
-class NotificationState {}
 
 class NotificationCubit extends Cubit<NotificationState> {
   final AwesomeNotifications notifications = AwesomeNotifications();
 
   NotificationCubit() : super(NotificationState());
 
-  Future<void> initialize() async {
+  Future<void> initialize(sound) async {
+    print(sound.split('.')[0]);
     await notifications.initialize(
       'resource://drawable/launcher_icon',
       [
@@ -371,11 +369,46 @@ class NotificationCubit extends Cubit<NotificationState> {
           channelKey: 'basic_channel',
           channelName: 'Basic notifications',
           channelDescription: 'Notification channel for basic notifications',
-          defaultColor: Color(0xFF9D50DD),
+          defaultColor: Colors.teal,
           ledColor: Colors.white,
+          soundSource: 'resource://raw/${sound.split('.')[0]}',
+          enableLights: true,
+          enableVibration: true,
+          locked: true,
+          importance: NotificationImportance.High,
+          playSound:
+              true, // This will use the default device notification sound
         ),
       ],
     );
+  }
+
+  Future<void> scheduleRepeatedNotifications(
+      int id,
+      DateTime initialTime,
+      String title,
+      String body,
+      int repeatIntervalInMinutes,
+      bool isEnabled,
+      BuildContext context,
+      sound) async {
+    Timer.periodic(Duration(minutes: repeatIntervalInMinutes), (timer) async {
+      final scheduledTime =
+          DateTime.now().add(Duration(minutes: repeatIntervalInMinutes));
+
+      await scheduleNotification(
+          id, scheduledTime, title, body, context, sound);
+
+      if (!isEnabled) {
+        timer.cancel(); // Stop the periodic timer if not enabled
+        await cancelAllNotifications();
+      }
+    });
+  }
+
+  Future<void> cancelAllNotifications() async {
+    await AwesomeNotifications().cancelAll();
+    emit(NotificationState());
   }
 
   Future<void> scheduleNotification(
@@ -383,15 +416,18 @@ class NotificationCubit extends Cubit<NotificationState> {
     DateTime scheduledTime,
     String title,
     String body,
+    BuildContext context,
+    String sound,
   ) async {
-    await initialize();
-
+    await initialize(sound);
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
+        bigPicture: 'asset://assets/images/app_icon.png',
         id: id,
         channelKey: 'basic_channel',
         title: title,
         body: body,
+        notificationLayout: NotificationLayout.BigPicture,
       ),
       schedule: NotificationCalendar(
         weekday: scheduledTime.weekday,
@@ -406,30 +442,11 @@ class NotificationCubit extends Cubit<NotificationState> {
     emit(NotificationState());
   }
 
-  Future<void> scheduleRepeatedNotifications(
-    int id,
-    DateTime initialTime,
-    String title,
-    String body,
-    int repeatIntervalInMinutes,
-    bool isEnabled,
-  ) async {
-    Timer.periodic(Duration(minutes: repeatIntervalInMinutes), (timer) async {
-      final scheduledTime =
-          initialTime.add(Duration(minutes: repeatIntervalInMinutes));
-      await scheduleNotification(id, scheduledTime, title, body);
+  // Other methods...
 
-      if (!isEnabled) {
-        timer.cancel(); // Stop the periodic timer if not enabled
-        await cancelAllNotifications();
-      }
-      // Update the initial time for the next iteration
-      initialTime = scheduledTime;
-    });
-  }
-
-  Future<void> cancelAllNotifications() async {
-    await AwesomeNotifications().cancelAll();
-    emit(NotificationState());
+  // Example of using the Cubit in a widget
+  Future<void> scheduleNotificationFromWidget(int id, DateTime scheduledTime,
+      String title, String body, BuildContext context, sound) async {
+    await scheduleNotification(id, scheduledTime, title, body, context, sound);
   }
 }
