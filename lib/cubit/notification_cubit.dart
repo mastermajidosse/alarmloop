@@ -360,14 +360,14 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   NotificationCubit() : super(NotificationState());
 
-  Future<void> initialize(sound) async {
-    print(sound.split('.')[0]);
+  Future<void> initialize(channel,String sound) async {
+    print('Initializing notifications with sound: $sound');
     await notifications.initialize(
       'resource://drawable/launcher_icon',
       [
         NotificationChannel(
-          channelKey: 'basic_channel',
-          channelName: 'Basic notifications',
+          channelKey: '$channel',
+          channelName: '$channel',
           channelDescription: 'Notification channel for basic notifications',
           defaultColor: Colors.teal,
           ledColor: Colors.white,
@@ -376,11 +376,11 @@ class NotificationCubit extends Cubit<NotificationState> {
           enableVibration: true,
           locked: true,
           importance: NotificationImportance.High,
-          playSound:
-              true, // This will use the default device notification sound
+          playSound: true,
         ),
       ],
     );
+    print('Notifications initialized successfully.');
   }
 
   Future<void> scheduleRepeatedNotifications(
@@ -393,14 +393,10 @@ class NotificationCubit extends Cubit<NotificationState> {
       BuildContext context,
       sound) async {
     Timer.periodic(Duration(minutes: repeatIntervalInMinutes), (timer) async {
-      final scheduledTime =
-          DateTime.now().add(Duration(minutes: repeatIntervalInMinutes));
-
-      await scheduleNotification(
-          id, scheduledTime, title, body, context, sound);
-
+      final scheduledTime = DateTime.now().add(Duration(minutes: repeatIntervalInMinutes));
+      await scheduleNotification(id, scheduledTime, title, body, context, sound);
       if (!isEnabled) {
-        timer.cancel(); // Stop the periodic timer if not enabled
+        timer.cancel();
         await cancelAllNotifications();
       }
     });
@@ -419,7 +415,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     BuildContext context,
     String sound,
   ) async {
-    await initialize(sound);
+    await initialize(id,sound);
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         bigPicture: 'asset://assets/images/app_icon.png',

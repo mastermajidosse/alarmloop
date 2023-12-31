@@ -391,6 +391,7 @@ class _UpdatedEditAlarmFormState extends State<UpdatedEditAlarmForm> {
                     //   // alarm.isEnabled,
                     // );
                     print("${alarm.sound.sound}");
+                    print("${alarm.id}");
                     notificationCubit.scheduleRepeatedNotifications(
                       alarm.id,
                       DateTime.now(), // Set initial time to current time
